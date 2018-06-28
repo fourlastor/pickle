@@ -1,0 +1,57 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+apply plugin: 'kotlin'
+apply from: "$rootDir/dependencies.gradle"
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'fourlastor'
+    groupId = 'com.fourlastor'
+    artifactId = 'pickle-plugin'
+    publishVersion = '1.0.0'
+    website = 'https://github.com/fourlastor/pickle'
+}
+
+repositories {
+    mavenCentral()
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+configurations {
+    includeInJar
+}
+
+gradlePlugin {
+    plugins {
+        pickle {
+            id = 'com.fourlastor.pickle'
+            implementationClass = 'com.fourlastor.pickle.PicklePlugin'
+        }
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'com.squareup:javapoet:1.9.0'
+    implementation 'com.google.code.gson:gson:2.8.1'
+    implementation 'com.android.tools.build:gradle:+'
+    implementation project(':lib')
+    includeInJar project(':lib')
+}
+
+jar {
+    from configurations.includeInJar.collect { it.isDirectory() ? it : zipTree(it) }
+}

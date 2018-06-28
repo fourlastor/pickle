@@ -1,0 +1,12 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply from: "$rootDir/dependencies.gradle"
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'fourlastor'
+    groupId = 'com.fourlastor'
+    artifactId = 'pickle-lib'
+    publishVersion = '1.0.0'
+    website = 'https://github.com/fourlastor/pickle'
+}

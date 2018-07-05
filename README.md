@@ -33,6 +33,8 @@ dependencies {
 
 Add the following to your app `build.gradle`
 
+Make sure to apply this plugin **before** the kotlin plugin, if using one. 
+
 ```gradle
 apply plugin: 'com.fourlastor.pickle'
 

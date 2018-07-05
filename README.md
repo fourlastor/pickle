@@ -24,7 +24,7 @@ buildscript {
 
 dependencies {
   androidTestImplementation 'com.fourlastor:pickle-lib:$pickleVersion'
-  androidTestApt 'com.fourlastor:pickle-processor:$pickleVersion'
+  androidTestAnnotationProcessor 'com.fourlastor:pickle-processor:$pickleVersion'
 }
 
 ```

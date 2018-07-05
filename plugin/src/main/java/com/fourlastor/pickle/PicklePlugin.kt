@@ -117,6 +117,7 @@ class PicklePlugin : Plugin<Project> {
                 this.hashClassFile = File(outputDir, "PickleHash.java")
             }
 
+            project.tasks.findByName("kapt${variant.name.capitalize()}Kotlin")?.dependsOn(task)
             task.dependsOn(variant.mergeAssets)
             variant.registerJavaGeneratingTask(task, outputDir)
         }

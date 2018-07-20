@@ -2,7 +2,7 @@
 
 Pickle is an implementation of Cucumber for Android which generates the tests classes at compile time instead of runtime.
 
-The main advantage over [cucumber-android](https://github.com/cucumber/cucumber-jvm/tree/master/android) is that you won't need to use a different instrumentation runner for your Cucumber tests, and that, being generated, you can debug and inspect the tests, which makes it easier to debug errors.
+The main advantage over [cucumber-android](https://github.com/cucumber/cucumber-android) is that you won't need to use a different instrumentation runner for your Cucumber tests, and that, being generated, you can debug and inspect the tests, which makes it easier to debug errors.
 
 ## Installation
 

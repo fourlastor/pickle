@@ -18,13 +18,17 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.fourlastor:pickle-plugin:$pickleVersion'
+    classpath "com.fourlastor:pickle-plugin:$pickleVersion"
   }
 }
 
 dependencies {
-  androidTestImplementation 'com.fourlastor:pickle-lib:$pickleVersion'
-  androidTestAnnotationProcessor 'com.fourlastor:pickle-processor:$pickleVersion'
+  androidTestImplementation "com.fourlastor:pickle-lib:$pickleVersion"
+  androidTestAnnotationProcessor "com.fourlastor:pickle-processor:$pickleVersion"
+  
+  // For Kotlin projects with `kapt`
+  // kaptAndroidTest "com.fourlastor:pickle-processor:$pickleVersion"
+
 }
 
 ```

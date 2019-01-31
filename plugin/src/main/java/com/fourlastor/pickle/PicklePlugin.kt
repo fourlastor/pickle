@@ -5,6 +5,7 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.TestVariant
+import com.android.build.gradle.tasks.MergeSourceSetFolders
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.JavaFile
@@ -13,10 +14,14 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.reflect.JavaReflectionUtil.method
+import org.gradle.internal.reflect.NoSuchMethodException
 import java.io.File
 import javax.lang.model.element.Modifier
 
@@ -112,13 +117,24 @@ class PicklePlugin : Plugin<Project> {
 
             val task = project.tasks.create(taskName, GenerateTask::class.java).apply {
                 this.packageName = packageName
-                this.featuresDir = File(variant.mergeAssets.outputDir, featuresDir)
+                this.featuresDir = File(variant.resolveOutputDir(), featuresDir)
                 this.strictMode = strictMode
                 this.hashClassFile = File(outputDir, "PickleHash.java")
             }
 
             task.dependsOn(variant.mergeAssets)
             variant.registerJavaGeneratingTask(task, outputDir)
+        }
+    }
+
+    private fun TestVariant.resolveOutputDir(): File {
+        return try {
+            val taskProvider = method(this, Any::class.java, "getMergeAssetsProvider").invoke(this)
+            val mergeAssets = method(taskProvider, MergeSourceSetFolders::class.java, "get").invoke(taskProvider)
+            val outputDirProvider = method(mergeAssets, Provider::class.java, "getOutputDir").invoke(mergeAssets)
+            (outputDirProvider.get() as Directory).asFile
+        } catch (ignored: NoSuchMethodException) {
+            mergeAssets.outputDir
         }
     }
 }

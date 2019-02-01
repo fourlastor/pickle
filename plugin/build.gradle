@@ -15,6 +15,7 @@ publish {
 }
 
 repositories {
+    google()
     mavenCentral()
 }
 
@@ -35,7 +36,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.squareup:javapoet:1.9.0'
     implementation 'com.google.code.gson:gson:2.8.1'
-    implementation 'com.android.tools.build:gradle:2.3.0'
+    implementation 'com.android.tools.build:gradle:3.3.0'
     implementation project(':lib')
     includeInJar project(':lib')
 }

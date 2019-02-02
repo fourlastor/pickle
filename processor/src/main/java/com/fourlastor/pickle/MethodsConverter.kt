@@ -46,4 +46,4 @@ class MethodsConverter(
     private fun skipMethod() = null
 }
 
-class UnsupportedStatementException(type: String) : IllegalArgumentException("Statements of type \"$type\" aren't supported")
+class UnsupportedStatementException(type: String) : PickleRuntimeException("Statements of type \"$type\" aren't supported")

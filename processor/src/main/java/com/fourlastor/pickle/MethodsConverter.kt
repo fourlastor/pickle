@@ -10,25 +10,33 @@ class MethodsConverter(
         private val strictMode: Boolean
 ) {
     fun convert(statements: List<CucumberTagStatement>): List<TestMethod> {
-        return statements.flatMap {
-            when (it) {
+        val duplicates = statements.findDuplicates()
+        if (duplicates.isNotEmpty()) {
+            throw DuplicateScenarioException(duplicates)
+        }
+
+        return statements.flatMap { statement ->
+            when (statement) {
                 is CucumberScenario -> {
-                    val methodName = it.gherkinModel.name.toCamelCase().decapitalize()
-                    val method = it.convertToMethod(methodName)
+                    val methodName = statement.gherkinModel.name.toCamelCase().decapitalize()
+                    val method = statement.convertToMethod(methodName)
                     Collections.singletonList(method)
                 }
                 is CucumberScenarioOutline -> {
-                    it.cucumberExamplesList.flatMap {
+                    statement.cucumberExamplesList.flatMap {
                         it.createExampleScenarios().mapIndexed { index, scenario ->
                             val methodName = "${scenario.gherkinModel.name.toCamelCase().decapitalize()}$index"
                             scenario.convertToMethod(methodName)
                         }
                     }
                 }
-                else -> throw UnsupportedStatementException(it::class.java.name)
+                else -> throw UnsupportedStatementException(statement::class.java.name)
             }
         }.filterNotNull()
     }
+
+    private fun List<CucumberTagStatement>.findDuplicates() =
+            groupingBy { it.visualName }.eachCount().filterValues { it > 1 }.keys
 
     private fun CucumberScenario.convertToMethod(name: String): TestMethod? {
         return try {
@@ -47,3 +55,10 @@ class MethodsConverter(
 }
 
 class UnsupportedStatementException(type: String) : IllegalArgumentException("Statements of type \"$type\" aren't supported")
+
+class DuplicateScenarioException(duplicateScenarios: Collection<String>) : RuntimeException("""
+    Scenarios need to have unique names.
+    Duplicate scenarios:
+    ${duplicateScenarios.joinToString(separator = "\n") { "> $it" }}
+    """.trimIndent()
+)

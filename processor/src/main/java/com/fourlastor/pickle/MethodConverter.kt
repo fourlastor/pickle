@@ -24,4 +24,4 @@ class MethodConverter(
     }
 }
 
-private fun CucumberScenario.stepsIncludingBackground() = (cucumberBackground?.steps ?: emptyList()) + steps
+private fun CucumberScenario.stepsIncludingBackground() = (cucumberBackground?.steps.orEmpty()) + steps

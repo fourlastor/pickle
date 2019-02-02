@@ -22,7 +22,7 @@ class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
 
         return methodStatements.flatMap { (field) ->
             methods.filter { method -> field.type.toString() == method.enclosingElement.asType().toString() }
-                    .map { method -> testMethodStatement(field, "\$N.\$N()", field.name, method.simpleName) }
+                    .map { method -> testMethodStatement(field, "\$N.\$N()", method.simpleName) }
         }.toSet()
     }
 }

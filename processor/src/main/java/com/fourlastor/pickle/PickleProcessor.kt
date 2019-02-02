@@ -16,17 +16,8 @@ class PickleProcessor : AbstractProcessor() {
 
         try {
             options(roundEnv).run {
-
                 val parser = FeatureParser()
-                val classConverter = ClassConverter(
-                        MethodsConverter(
-                                MethodConverter(
-                                        StatementConverter(roundEnv),
-                                        StatementHooksCreator(roundEnv)
-                                ),
-                                strictMode
-                        )
-                )
+                val classConverter = createClassConverter(roundEnv)
 
                 val generator = ClassGenerator()
                 val writer = ClassWriter(processingEnv, packageName)
@@ -42,6 +33,18 @@ class PickleProcessor : AbstractProcessor() {
         } finally {
             return false
         }
+    }
+
+    private fun Options.createClassConverter(roundEnv: RoundEnvironment): ClassConverter {
+        return ClassConverter(
+                MethodsConverter(
+                        MethodConverter(
+                                StatementConverter(roundEnv),
+                                StatementHooksCreator(roundEnv)
+                        ),
+                        strictMode
+                )
+        )
     }
 
     private fun Messager.error(message: String) {

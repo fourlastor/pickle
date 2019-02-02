@@ -4,10 +4,13 @@ import cucumber.runtime.model.CucumberScenario
 import cucumber.runtime.model.CucumberScenarioOutline
 import cucumber.runtime.model.CucumberTagStatement
 import java.util.Collections
+import javax.annotation.processing.Messager
+import javax.tools.Diagnostic
 
 class MethodsConverter(
         private val methodConverter: MethodConverter,
-        private val strictMode: Boolean
+        private val strictMode: Boolean,
+        private val messager: Messager
 ) {
     fun convert(statements: List<CucumberTagStatement>): List<TestMethod> {
         val duplicates = statements.findDuplicates()
@@ -45,13 +48,22 @@ class MethodsConverter(
             if (strictMode) {
                 propagate(e)
             }
-            skipMethod()
+            skipMethod().also {
+                messager.warning("""
+                    ${e.message}
+                    "${gherkinModel.keyword}: ${gherkinModel.name}" will be skipped.
+                """.trimIndent())
+            }
         }
     }
 
     private fun propagate(e: MissingStepDefinitionException): Nothing = throw e
 
     private fun skipMethod() = null
+
+    private fun Messager.warning(message: String) {
+        printMessage(Diagnostic.Kind.WARNING, message)
+    }
 }
 
 class UnsupportedStatementException(type: String) : IllegalArgumentException("Statements of type \"$type\" aren't supported")

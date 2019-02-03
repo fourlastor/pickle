@@ -92,12 +92,12 @@ class PicklePlugin : Plugin<Project> {
             project.plugins.all {
                 when (it) {
                     is LibraryPlugin -> {
-                        project.extensions.findByType(LibraryExtension::class.java).run {
+                        project.extensions.findByType(LibraryExtension::class.java)?.run {
                             configure(project, testVariants, extension)
                         }
                     }
                     is AppPlugin -> {
-                        project.extensions.findByType(AppExtension::class.java).run {
+                        project.extensions.findByType(AppExtension::class.java)?.run {
                             configure(project, testVariants, extension)
                         }
                     }

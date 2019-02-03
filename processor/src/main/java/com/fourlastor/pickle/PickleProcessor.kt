@@ -39,7 +39,7 @@ class PickleProcessor : AbstractProcessor() {
             }
         } catch (exception: Exception) {
             processingEnv.messager.error("""
-                Pickler Error:
+                Pickle Error:
                 ${exception.message}
             """.trimIndent())
         } finally {

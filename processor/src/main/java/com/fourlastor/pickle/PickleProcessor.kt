@@ -29,7 +29,10 @@ class PickleProcessor : AbstractProcessor() {
                         .forEach { writer.write(it) }
             }
         } catch (exception: Exception) {
-            processingEnv.messager.error(exception.message!!)
+            processingEnv.messager.error("""
+                Pickle Error:
+                ${exception.message}
+            """.trimIndent())
         } finally {
             return false
         }

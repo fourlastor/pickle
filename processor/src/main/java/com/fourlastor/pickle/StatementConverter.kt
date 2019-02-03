@@ -31,8 +31,16 @@ class StatementConverter(roundEnv: RoundEnvironment) {
 
         val parameterValues = matches.groupValues.drop(1).toTypedArray()
         val parameterTypes = stepDefinition.element.parameters.map { it.asType() }
+        if (parameterTypes.size != parameterValues.size) {
+            throw StepDefinitionArgumentsMismatchException(step.name, stepDefinition.element)
+        }
         val parameterStringFormat = parameterTypes.joinToString(", ") { if (it.toString() == String::class.java.name) "\$S" else "\$L" }
-        return testMethodStatement(stepsField, "\$N.\$N($parameterStringFormat)", stepsField.name, stepDefinition.element.simpleName, *parameterValues)
+        return testMethodStatement(
+                testField = stepsField,
+                statementFormat = "\$N.\$N($parameterStringFormat)",
+                methodName = stepDefinition.element.simpleName,
+                args = *parameterValues
+        )
     }
 }
 
@@ -57,3 +65,9 @@ private fun RoundEnvironment.getStepDefinitions(): List<StepDefinition> {
 }
 
 private data class StepDefinition(val element: ExecutableElement, val regex: Regex)
+
+class StepDefinitionArgumentsMismatchException(stepName: String, element: ExecutableElement) : RuntimeException("""
+    Step definition argument mismatch.
+    > Step definition: "$stepName"
+    > Step implementation: ${element.enclosingElement}.$element
+""".trimIndent())

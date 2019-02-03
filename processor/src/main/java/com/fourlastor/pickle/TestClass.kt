@@ -1,5 +1,6 @@
 package com.fourlastor.pickle
 
+import javax.lang.model.element.Name
 import javax.lang.model.element.TypeElement
 
 data class TestClass(val name: String, val methods: List<TestMethod>, val fields: Set<TestField>)
@@ -10,5 +11,5 @@ data class TestField(val type: TypeElement) {
             get() = type.qualifiedName.toString().decapitalize().replace('.', '_')
 }
 
-fun testMethodStatement(field: TestField, statementFormat: String, vararg args: Any) =
-        TestMethodStatement(field, statementFormat, args.asList())
+fun testMethodStatement(testField: TestField, statementFormat: String, methodName: Name, vararg args: Any) =
+        TestMethodStatement(testField, statementFormat, listOf(testField.name, methodName) + args)

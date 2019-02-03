@@ -17,7 +17,7 @@ import javax.tools.JavaFileObject
 
 class PickleTest {
 
-    private val featuresDir = Resources.getResource("features").path
+    private val featuresDir = featuresDir("features")
     private val strict = true
     private val nonStrict = false
 
@@ -63,11 +63,12 @@ class PickleTest {
         )
 
         assertThat(compilation).succeeded()
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step from another definition file\"")
+        assertThat(compilation).hadWarningContaining("\"Scenario: Scenario with one step and background\" will be skipped.")
         assertThat(compilation).successfullyGeneratedTestClasses(
                 "$packageName/AFeatureWithoutBackgroundTest.java"
         )
     }
-
 
     @Test
     fun featureWithDefinedStepsAndHooks() {
@@ -84,6 +85,38 @@ class PickleTest {
                 "$packageName/AFeatureWithBackgroundTest.java"
         )
     }
+
+    @Test
+    fun featureWithDuplicateScenarios() {
+        val compilation = whenCompilingWith(
+                featuresDir("featuresDuplicateScenario"),
+                "target",
+                strict,
+                "steps/Steps.java"
+        )
+
+        assertThat(compilation).failed()
+        assertThat(compilation).hadErrorContaining("Scenarios need to have unique names.")
+        assertThat(compilation).hadErrorContaining("Duplicate scenarios:")
+        assertThat(compilation).hadErrorContaining("> Scenario: Duplicate scenario")
+    }
+
+    @Test
+    fun featureWithStepDefinitionArgumentsMismatch() {
+        val compilation = whenCompilingWith(
+                featuresDir,
+                "target",
+                strict,
+                "steps/Steps.java", "steps/OtherStepsWithWrongArguments.java"
+        )
+
+        assertThat(compilation).failed()
+        assertThat(compilation).hadErrorContaining("Step definition argument mismatch.")
+        assertThat(compilation).hadErrorContaining("> Step definition: \"A step from another definition file\"")
+        assertThat(compilation).hadErrorContaining("> Step implementation: steps.OtherStepsWithWrongArguments.aStepFromAnotherDefinitionFile(java.lang.String)")
+    }
+
+    private fun featuresDir(dirName: String) = Resources.getResource(dirName).path
 
     private fun whenCompilingWith(
             featuresDir: String,

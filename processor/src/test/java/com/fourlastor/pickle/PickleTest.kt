@@ -34,7 +34,7 @@ class PickleTest {
 
         assertThat(compilation).successfullyGeneratedTestClasses(
                 "$packageName/AFeatureWithoutBackgroundTest.java",
-                "$packageName/AFeatureWithBackgroundTest.java"
+                "$packageName/AFeatureWithBackgroundTest____.java"
         )
     }
 

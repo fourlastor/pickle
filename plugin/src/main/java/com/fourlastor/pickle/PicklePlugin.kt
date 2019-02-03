@@ -4,6 +4,7 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.tasks.MergeSourceSetFolders
 import com.squareup.javapoet.AnnotationSpec
@@ -83,22 +84,34 @@ class PicklePlugin : Plugin<Project> {
         var packageName: String? = null
         var featuresDir: String? = null
         var strictMode: Boolean = true
+        var androidTest: Boolean = true
+        var unitTest: Boolean = false
     }
 
     override fun apply(project: Project) {
         val extension = project.extensions.create("pickle", Extension::class.java)
 
         project.afterEvaluate {
-            project.plugins.all {
-                when (it) {
+            project.plugins.all { plugin ->
+                when (plugin) {
                     is LibraryPlugin -> {
                         project.extensions.findByType(LibraryExtension::class.java)?.run {
-                            configure(project, testVariants, extension)
+                            if (extension.androidTest) {
+                                configure(project, testVariants, extension)
+                            }
+                            if (extension.unitTest) {
+                                configure(project, unitTestVariants, extension)
+                            }
                         }
                     }
                     is AppPlugin -> {
                         project.extensions.findByType(AppExtension::class.java)?.run {
-                            configure(project, testVariants, extension)
+                            if (extension.androidTest) {
+                                configure(project, testVariants, extension)
+                            }
+                            if (extension.unitTest) {
+                                configure(project, unitTestVariants, extension)
+                            }
                         }
                     }
                 }
@@ -106,7 +119,7 @@ class PicklePlugin : Plugin<Project> {
         }
     }
 
-    private fun configure(project: Project, variants: DomainObjectSet<out TestVariant>, extension: Extension) {
+    private fun configure(project: Project, variants: DomainObjectSet<out BaseVariant>, extension: Extension) {
         val featuresDir = extension.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" for pickle")
         val packageName = extension.packageName ?: throw IllegalStateException("You must specify \"packageName\" for pickle")
         val strictMode = extension.strictMode
@@ -127,7 +140,7 @@ class PicklePlugin : Plugin<Project> {
         }
     }
 
-    private fun TestVariant.resolveOutputDir(): File {
+    private fun BaseVariant.resolveOutputDir(): File {
         return try {
             val taskProvider = method(this, Any::class.java, "getMergeAssetsProvider").invoke(this)
             val mergeAssets = method(taskProvider, MergeSourceSetFolders::class.java, "get").invoke(taskProvider)

@@ -31,6 +31,8 @@ dependencies {
 
 }
 
+If you enable pickle on unit tests (see configuration below), remember to apply the annotation processor on your test variant!
+
 ```
 
 ## Configuration
@@ -45,7 +47,9 @@ apply plugin: 'com.fourlastor.pickle'
 pickle {
     featuresDir = 'features' // location of features inside `androidTest/src/assets`
     packageName = 'com.example.test' // package where tests will be generated
-    strictMode = false // activate/deactivate strict mode (optional, defaults to true)
+    strictMode = false // activate/deactivate strict mode (defaults to true)
+    androidTest = true // enables pickle on androidTest (defaults to true)
+    unitTest = true // enables pickle on unit tests (defaults to false)
 }
 ```
 

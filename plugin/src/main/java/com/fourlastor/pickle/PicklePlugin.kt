@@ -21,7 +21,6 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.reflect.JavaReflectionUtil.method
-import org.gradle.internal.reflect.NoSuchMethodException
 import java.io.File
 import javax.lang.model.element.Modifier
 
@@ -122,19 +121,41 @@ class PicklePlugin : Plugin<Project> {
                 this.hashClassFile = File(outputDir, "PickleHash.java")
             }
 
-            task.dependsOn(variant.mergeAssets)
+            setupDependency(task, variant)
             variant.registerJavaGeneratingTask(task, outputDir)
         }
     }
 
+    /**
+     * Resolve mergeAssets task outputDir in a backward compatible way.
+     *
+     * Reflection is needed since Google changed the type of a public getter in an incompatible way.
+     *
+     * Remove this when we want to only support Android Gradle Plugin 3.4 and above.
+     */
     private fun TestVariant.resolveOutputDir(): File {
         return try {
             val taskProvider = method(this, Any::class.java, "getMergeAssetsProvider").invoke(this)
             val mergeAssets = method(taskProvider, MergeSourceSetFolders::class.java, "get").invoke(taskProvider)
             val outputDirProvider = method(mergeAssets, Provider::class.java, "getOutputDir").invoke(mergeAssets)
             (outputDirProvider.get() as Directory).asFile
-        } catch (ignored: NoSuchMethodException) {
+        } catch (ignored: Exception) {
             mergeAssets.outputDir
+        }
+    }
+
+    /**
+     * Setup Pickle task dependency in a backward compatible way.
+     *
+     * mergeAssetsProvider was only introduced by Android Gradle Plugin 3.3.
+     *
+     * Remove this when we want to only support Android Gradle Plugin 3.3 and above.
+     */
+    private fun setupDependency(task: GenerateTask, variant: TestVariant) {
+        try {
+            task.dependsOn(variant.mergeAssetsProvider)
+        } catch (ignored: Exception) {
+            task.dependsOn(variant.mergeAssets)
         }
     }
 }

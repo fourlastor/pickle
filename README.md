@@ -10,7 +10,7 @@ Add this to your app `build.gradle` dependencies.
 
 ```gradle
 
-ext.pickleVersion = '1.1.0'
+ext.pickleVersion = '1.1.1'
 
 buildscript {
   repositories {

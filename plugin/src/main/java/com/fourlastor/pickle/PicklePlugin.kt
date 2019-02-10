@@ -6,6 +6,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
+import com.android.build.gradle.api.UnitTestVariant
 import com.android.build.gradle.tasks.MergeSourceSetFolders
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.FieldSpec
@@ -85,6 +86,7 @@ class PicklePlugin : Plugin<Project> {
         var strictMode: Boolean = true
         var androidTest: Boolean = true
         var unitTest: Boolean = false
+        var unitTestFeaturesDir: String? = null
     }
 
     override fun apply(project: Project) {
@@ -96,20 +98,20 @@ class PicklePlugin : Plugin<Project> {
                     is LibraryPlugin -> {
                         project.extensions.findByType(LibraryExtension::class.java)?.run {
                             if (extension.androidTest) {
-                                configure(project, testVariants, extension)
+                                configureAndroidTest(project, testVariants, extension)
                             }
                             if (extension.unitTest) {
-                                configure(project, unitTestVariants, extension)
+                                configureUnitTest(project, unitTestVariants, extension)
                             }
                         }
                     }
                     is AppPlugin -> {
                         project.extensions.findByType(AppExtension::class.java)?.run {
                             if (extension.androidTest) {
-                                configure(project, testVariants, extension)
+                                configureAndroidTest(project, testVariants, extension)
                             }
                             if (extension.unitTest) {
-                                configure(project, unitTestVariants, extension)
+                                configureUnitTest(project, unitTestVariants, extension)
                             }
                         }
                     }
@@ -118,8 +120,25 @@ class PicklePlugin : Plugin<Project> {
         }
     }
 
-    private fun configure(project: Project, variants: DomainObjectSet<out BaseVariant>, extension: Extension) {
-        val featuresDir = extension.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" for pickle")
+    private fun configureAndroidTest(project: Project, variants: DomainObjectSet<out TestVariant>, extension: Extension) {
+        val featuresDir = extension.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" for pickle to work with Android tests")
+
+        configure(project, variants, extension, featuresDir) { variant, dir -> File(variant.resolveOutputDir(), dir)}
+    }
+
+    private fun configureUnitTest(project: Project, variants: DomainObjectSet<out UnitTestVariant>, extension: Extension) {
+        val featuresDir = extension.unitTestFeaturesDir ?: throw IllegalStateException("You must specify \"unitTestFeaturesDir\" for pickle to work with unit tests")
+
+        configure(project, variants, extension, featuresDir) { _, dir -> File(dir)}
+    }
+
+    private fun configure(
+        project: Project,
+        variants: DomainObjectSet<out BaseVariant>,
+        extension: Extension,
+        featuresDir: String,
+        featureFn: (BaseVariant, String)->File
+    ) {
         val packageName = extension.packageName ?: throw IllegalStateException("You must specify \"packageName\" for pickle")
         val strictMode = extension.strictMode
 
@@ -129,7 +148,7 @@ class PicklePlugin : Plugin<Project> {
 
             val task = project.tasks.create(taskName, GenerateTask::class.java).apply {
                 this.packageName = packageName
-                this.featuresDir = File(variant.resolveOutputDir(), featuresDir)
+                this.featuresDir = featureFn(variant, featuresDir)
                 this.strictMode = strictMode
                 this.hashClassFile = File(outputDir, "PickleHash.java")
             }

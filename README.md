@@ -50,10 +50,14 @@ pickle {
     strictMode = true // activate/deactivate strict mode (defaults to true)
     androidTest = true // enables pickle on androidTest (defaults to true)
     unitTest = false // enables pickle on unit tests (defaults to false)
+    unitTestFeaturesDir = project.file('src/test/features') // absolute path to location of feature files for unit tests
 }
 ```
 
-Test will be generated and you can run them as you would run normal Android Tests :tada:
+* `featuresDir` will be used for Android tests, it's a path inside the assets folder
+* `unitTestFeaturesDir` will be used for unit tests, it's an absolute path to your feature files
+
+Test will be generated and you can run them as you would run normal Android/unit tests :tada:
 
 Disabling strict mode will generate tests only for defined scenarios, a scenario is considered defined if all the steps and background steps for that scenario are defined. The default behavior (strict) will fail at compile time if some scenarios aren't defined.
 

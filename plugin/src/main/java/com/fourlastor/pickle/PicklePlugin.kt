@@ -123,13 +123,28 @@ class PicklePlugin : Plugin<Project> {
     private fun configureAndroidTest(project: Project, variants: DomainObjectSet<out TestVariant>, extension: Extension) {
         val featuresDir = extension.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" for pickle to work with Android tests")
 
-        configure(project, variants, extension, featuresDir) { variant, dir -> File(variant.resolveOutputDir(), dir)}
+        configure(project, variants, extension, featuresDir, { variant, dir -> File(variant.resolveOutputDir(), dir) }, { task, variant -> task.setupDependency(variant) })
+    }
+
+    /**
+     * Setup Pickle task dependency in a backward compatible way.
+     *
+     * mergeAssetsProvider was only introduced by Android Gradle Plugin 3.3.
+     *
+     * Remove this when we want to only support Android Gradle Plugin 3.3 and above.
+     */
+    private fun GenerateTask.setupDependency(variant: BaseVariant) {
+        try {
+            dependsOn(variant.mergeAssetsProvider)
+        } catch (ignored: Exception) {
+            dependsOn(variant.mergeAssets)
+        }
     }
 
     private fun configureUnitTest(project: Project, variants: DomainObjectSet<out UnitTestVariant>, extension: Extension) {
         val featuresDir = extension.unitTestFeaturesDir ?: throw IllegalStateException("You must specify \"unitTestFeaturesDir\" for pickle to work with unit tests")
 
-        configure(project, variants, extension, featuresDir) { _, dir -> File(dir)}
+        configure(project, variants, extension, featuresDir, { _, dir -> File(dir) })
     }
 
     private fun configure(
@@ -137,7 +152,8 @@ class PicklePlugin : Plugin<Project> {
         variants: DomainObjectSet<out BaseVariant>,
         extension: Extension,
         featuresDir: String,
-        featureFn: (BaseVariant, String)->File
+        featureFn: (BaseVariant, String)->File,
+        setupDependency: (GenerateTask, BaseVariant) -> Unit = {_,_ -> }
     ) {
         val packageName = extension.packageName ?: throw IllegalStateException("You must specify \"packageName\" for pickle")
         val strictMode = extension.strictMode
@@ -173,21 +189,6 @@ class PicklePlugin : Plugin<Project> {
             (outputDirProvider.get() as Directory).asFile
         } catch (ignored: Exception) {
             mergeAssets.outputDir
-        }
-    }
-
-    /**
-     * Setup Pickle task dependency in a backward compatible way.
-     *
-     * mergeAssetsProvider was only introduced by Android Gradle Plugin 3.3.
-     *
-     * Remove this when we want to only support Android Gradle Plugin 3.3 and above.
-     */
-    private fun setupDependency(task: GenerateTask, variant: BaseVariant) {
-        try {
-            task.dependsOn(variant.mergeAssetsProvider)
-        } catch (ignored: Exception) {
-            task.dependsOn(variant.mergeAssets)
         }
     }
 }

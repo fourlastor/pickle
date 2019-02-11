@@ -139,7 +139,7 @@ class PicklePlugin : Plugin<Project> {
             val mergeAssets = method(taskProvider, MergeSourceSetFolders::class.java, "get").invoke(taskProvider)
             val outputDirProvider = method(mergeAssets, Provider::class.java, "getOutputDir").invoke(mergeAssets)
             (outputDirProvider.get() as Directory).asFile
-        } catch (ignored: Exception) {
+        } catch (ignored: Throwable) {
             mergeAssets.outputDir
         }
     }
@@ -154,7 +154,7 @@ class PicklePlugin : Plugin<Project> {
     private fun setupDependency(task: GenerateTask, variant: TestVariant) {
         try {
             task.dependsOn(variant.mergeAssetsProvider)
-        } catch (ignored: Exception) {
+        } catch (ignored: Throwable) {
             task.dependsOn(variant.mergeAssets)
         }
     }

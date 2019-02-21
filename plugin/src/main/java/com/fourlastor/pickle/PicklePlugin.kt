@@ -8,6 +8,7 @@ import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.api.UnitTestVariant
 import com.android.build.gradle.tasks.MergeSourceSetFolders
+import com.fourlastor.pickle.JavaMethod.method
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.JavaFile
@@ -22,7 +23,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.reflect.JavaReflectionUtil.method
 import java.io.File
 import javax.lang.model.element.Modifier
 

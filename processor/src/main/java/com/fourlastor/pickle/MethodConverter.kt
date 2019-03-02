@@ -2,10 +2,7 @@ package com.fourlastor.pickle
 
 import cucumber.runtime.model.CucumberScenario
 
-class MethodConverter(
-        private val statementConverter: StatementConverter,
-        private val statementHooksCreator: StatementHooksCreator
-) {
+class MethodConverter(private val statementConverter: StatementConverter) {
 
     fun convert(name: String, scenario: CucumberScenario): TestMethod {
         val statements = createStatementsFor(scenario)

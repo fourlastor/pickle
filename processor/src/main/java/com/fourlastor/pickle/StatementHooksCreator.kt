@@ -5,25 +5,25 @@ import cucumber.api.java.Before
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.TypeElement
 
 class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
-    fun createBeforeHooks(methodStatements: List<TestMethodStatement>): Set<TestMethodStatement> =
-            generateStatementsFor(Before::class.java, roundEnv, methodStatements)
+    fun createBeforeHooks(): List<TestMethodStatement> =
+            generateStatementsFor(Before::class.java, roundEnv)
 
-    fun createAfterHooks(methodStatements: List<TestMethodStatement>): Set<TestMethodStatement> =
-            generateStatementsFor(After::class.java, roundEnv, methodStatements)
+    fun createAfterHooks(): List<TestMethodStatement> =
+            generateStatementsFor(After::class.java, roundEnv)
 
     private fun generateStatementsFor(
             annotation: Class<out Annotation>,
-            roundEnv: RoundEnvironment,
-            methodStatements: List<TestMethodStatement>
-    ): Set<TestMethodStatement> {
+            roundEnv: RoundEnvironment
+    ): List<TestMethodStatement> {
         val methods = roundEnv.getMethodsAnnotatedWith(annotation)
 
-        return methodStatements.flatMap { (field) ->
-            methods.filter { method -> field.type.toString() == method.enclosingElement.asType().toString() }
-                    .map { method -> testMethodStatement(field, "\$N.\$N()", method.simpleName) }
-        }.toSet()
+        return methods.map { method ->
+            val field = TestField(method.enclosingElement as TypeElement)
+            testMethodStatement(field, "\$N.\$N()", method.simpleName)
+        }
     }
 }
 

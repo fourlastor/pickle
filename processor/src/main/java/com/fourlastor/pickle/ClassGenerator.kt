@@ -18,15 +18,31 @@ class ClassGenerator {
         runWithJUnit4()
         addModifiers(Modifier.PUBLIC)
 
-        testClass.methods.forEach {
-            method(it.name) {
+        testClass.hookMethods
+                .filter { it.statements.isNotEmpty() }
+                .forEach { hook ->
+                    method(hook.name) {
+                        addModifiers(Modifier.PUBLIC)
+                        addException(Throwable::class.java)
+                        addAnnotation(hook.annotation)
+
+                        code {
+                            hook.statements.forEach {
+                                addStatement(it.statementFormat, *it.args.toTypedArray())
+                            }
+                        }
+                    }
+                }
+
+        testClass.methods.forEach { method ->
+            method(method.name) {
 
                 addModifiers(Modifier.PUBLIC)
                 addException(Throwable::class.java)
                 addAnnotation(Test)
 
                 code {
-                    it.statements.forEach {
+                    method.statements.forEach {
                         addStatement(it.statementFormat, *it.args.toTypedArray())
                     }
                 }

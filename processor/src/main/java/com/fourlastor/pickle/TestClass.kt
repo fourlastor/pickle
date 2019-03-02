@@ -4,7 +4,7 @@ import javax.lang.model.element.Name
 import javax.lang.model.element.TypeElement
 
 data class TestClass(val name: String, val methods: List<TestMethod>, val fields: Set<TestField>)
-data class TestMethod(val name: String, val statements: Set<TestMethodStatement>)
+data class TestMethod(val name: String, val statements: List<TestMethodStatement>)
 data class TestMethodStatement(val field: TestField, val statementFormat: String, val args: List<Any>)
 data class TestField(val type: TypeElement) {
     val name: String

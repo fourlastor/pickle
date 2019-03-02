@@ -93,7 +93,7 @@ class PickleTest {
                 featuresDir,
                 packageName,
                 strict,
-                "steps/Steps.java", "steps/OtherSteps.java"//, "steps/JustHooks.java"
+                "steps/Steps.java", "steps/OtherSteps.java", "steps/JustHooks.java"
         )
 
         assertThat(compilation).successfullyGeneratedTestClasses(

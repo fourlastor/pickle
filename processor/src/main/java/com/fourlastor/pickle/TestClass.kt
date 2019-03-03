@@ -21,9 +21,3 @@ data class TestField(val type: TypeElement) {
 
 fun testMethodStatement(testField: TestField, statementFormat: String, methodName: Name, vararg args: Any) =
         TestMethodStatement(testField, statementFormat, listOf(testField.name, methodName) + args)
-
-fun beforeHookMethod(statements: List<TestMethodStatement>) =
-        HookMethod(ClassName.bestGuess("org.junit.Before")!!, "setUp", statements)
-
-fun afterHookMethod(statements: List<TestMethodStatement>) =
-        HookMethod(ClassName.bestGuess("org.junit.After")!!, "tearDown", statements)

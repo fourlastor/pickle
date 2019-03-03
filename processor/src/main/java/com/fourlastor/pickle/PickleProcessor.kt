@@ -49,7 +49,7 @@ class PickleProcessor : AbstractProcessor() {
                         strictMode,
                         messager
                 ),
-                StatementHooksCreator(roundEnv)
+                HooksCreator(StatementHooksCreator(roundEnv))
         )
     }
 

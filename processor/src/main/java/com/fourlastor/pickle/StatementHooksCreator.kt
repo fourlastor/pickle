@@ -32,11 +32,9 @@ class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
             when (val annotation = getAnnotation(annotationType)) {
                 is Before -> annotation.order
                 is After -> annotation.order
-                else -> DEFAULT_CUCUMBER_HOOK_ORDER
+                else -> throw IllegalStateException("Unexpected Cucumber annotation used: $annotationType")
             }
 }
-
-private const val DEFAULT_CUCUMBER_HOOK_ORDER = 10000
 
 private fun <T : Annotation> RoundEnvironment.getMethodsAnnotatedWith(clazz: Class<T>): List<ExecutableElement> {
     return getElementsAnnotatedWith(clazz)

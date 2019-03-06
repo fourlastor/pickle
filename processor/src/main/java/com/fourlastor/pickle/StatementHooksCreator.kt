@@ -5,26 +5,35 @@ import cucumber.api.java.Before
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.TypeElement
 
 class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
-    fun createBeforeHooks(methodStatements: List<TestMethodStatement>): Set<TestMethodStatement> =
-            generateStatementsFor(Before::class.java, roundEnv, methodStatements)
+    fun createBeforeHooks(): List<TestMethodStatement> =
+            generateStatementsFor(Before::class.java, roundEnv)
 
-    fun createAfterHooks(methodStatements: List<TestMethodStatement>): Set<TestMethodStatement> =
-            generateStatementsFor(After::class.java, roundEnv, methodStatements)
+    fun createAfterHooks(): List<TestMethodStatement> =
+            generateStatementsFor(After::class.java, roundEnv)
 
     private fun generateStatementsFor(
-            annotation: Class<out Annotation>,
-            roundEnv: RoundEnvironment,
-            methodStatements: List<TestMethodStatement>
-    ): Set<TestMethodStatement> {
-        val methods = roundEnv.getMethodsAnnotatedWith(annotation)
+            annotationType: Class<out Annotation>,
+            roundEnv: RoundEnvironment
+    ): List<TestMethodStatement> {
+        val methods = roundEnv.getMethodsAnnotatedWith(annotationType)
 
-        return methodStatements.flatMap { (field) ->
-            methods.filter { method -> field.type.toString() == method.enclosingElement.asType().toString() }
-                    .map { method -> testMethodStatement(field, "\$N.\$N()", method.simpleName) }
-        }.toSet()
+        return methods.sortedBy {
+            it.annotationOrder(annotationType)
+        }.map { method ->
+            val field = TestField(method.enclosingElement as TypeElement)
+            testMethodStatement(field, "\$N.\$N()", method.simpleName)
+        }
     }
+
+    private fun ExecutableElement.annotationOrder(annotationType: Class<out Annotation>) =
+            when (val annotation = getAnnotation(annotationType)) {
+                is Before -> annotation.order
+                is After -> annotation.order
+                else -> throw IllegalStateException("Unexpected Cucumber annotation used: $annotationType")
+            }
 }
 
 private fun <T : Annotation> RoundEnvironment.getMethodsAnnotatedWith(clazz: Class<T>): List<ExecutableElement> {

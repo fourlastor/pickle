@@ -87,6 +87,22 @@ class PickleTest {
     }
 
     @Test
+    fun featureWithDefinedStepsAndHooksFromSeparateFile() {
+        val packageName = "targetWithSeparateHooks"
+        val compilation = whenCompilingWith(
+                featuresDir,
+                packageName,
+                strict,
+                "steps/Steps.java", "steps/OtherSteps.java", "steps/JustHooks.java"
+        )
+
+        assertThat(compilation).successfullyGeneratedTestClasses(
+                "$packageName/AFeatureWithoutBackgroundTest.java",
+                "$packageName/AFeatureWithBackgroundTest.java"
+        )
+    }
+
+    @Test
     fun featureWithDuplicateScenarios() {
         val compilation = whenCompilingWith(
                 featuresDir("featuresDuplicateScenario"),

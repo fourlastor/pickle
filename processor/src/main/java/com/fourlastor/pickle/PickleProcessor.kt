@@ -1,6 +1,10 @@
 package com.fourlastor.pickle
 
-import javax.annotation.processing.*
+import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.Messager
+import javax.annotation.processing.RoundEnvironment
+import javax.annotation.processing.SupportedAnnotationTypes
+import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
@@ -41,13 +45,11 @@ class PickleProcessor : AbstractProcessor() {
     private fun Options.createClassConverter(roundEnv: RoundEnvironment, messager: Messager): ClassConverter {
         return ClassConverter(
                 MethodsConverter(
-                        MethodConverter(
-                                StatementConverter(roundEnv),
-                                StatementHooksCreator(roundEnv)
-                        ),
+                        MethodConverter(StatementConverter(roundEnv)),
                         strictMode,
                         messager
-                )
+                ),
+                HooksCreator(StatementHooksCreator(roundEnv))
         )
     }
 

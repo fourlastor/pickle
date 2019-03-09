@@ -4,7 +4,9 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
+import com.android.build.gradle.api.UnitTestVariant
 import com.android.build.gradle.tasks.MergeSourceSetFolders
 import com.fourlastor.pickle.JavaMethod.method
 import com.squareup.javapoet.AnnotationSpec
@@ -78,26 +80,39 @@ class PicklePlugin : Plugin<Project> {
         }
     }
 
-    open class Extension {
-        var packageName: String? = null
-        var featuresDir: String? = null
-        var strictMode: Boolean = true
-    }
+    open class Extension(
+        var packageName: String? = null,
+        var strictMode: Boolean = true,
+        var androidTest: TestExtension = TestExtension(true),
+        var unitTest: TestExtension = TestExtension(false)
+    )
+
+    open class TestExtension(var enabled: Boolean, var featuresDir: String? = null)
 
     override fun apply(project: Project) {
         val extension = project.extensions.create("pickle", Extension::class.java)
 
         project.afterEvaluate {
-            project.plugins.all {
-                when (it) {
+            project.plugins.all { plugin ->
+                when (plugin) {
                     is LibraryPlugin -> {
                         project.extensions.findByType(LibraryExtension::class.java)?.run {
-                            configure(project, testVariants, extension)
+                            if (extension.androidTest.enabled) {
+                                configureAndroidTest(project, testVariants, extension)
+                            }
+                            if (extension.unitTest.enabled) {
+                                configureUnitTest(project, unitTestVariants, extension)
+                            }
                         }
                     }
                     is AppPlugin -> {
                         project.extensions.findByType(AppExtension::class.java)?.run {
-                            configure(project, testVariants, extension)
+                            if (extension.androidTest.enabled) {
+                                configureAndroidTest(project, testVariants, extension)
+                            }
+                            if (extension.unitTest.enabled) {
+                                configureUnitTest(project, unitTestVariants, extension)
+                            }
                         }
                     }
                 }
@@ -105,8 +120,41 @@ class PicklePlugin : Plugin<Project> {
         }
     }
 
-    private fun configure(project: Project, variants: DomainObjectSet<out TestVariant>, extension: Extension) {
-        val featuresDir = extension.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" for pickle")
+    private fun configureAndroidTest(project: Project, variants: DomainObjectSet<out TestVariant>, extension: Extension) {
+        val featuresDir = extension.androidTest.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" inside \"androidTest\" for pickle to work with Android tests")
+
+        configure(project, variants, extension, featuresDir, { variant, dir -> File(variant.resolveOutputDir(), dir) }, { task, variant -> task.setupDependency(variant) })
+    }
+
+    /**
+     * Setup Pickle task dependency in a backward compatible way.
+     *
+     * mergeAssetsProvider was only introduced by Android Gradle Plugin 3.3.
+     *
+     * Remove this when we want to only support Android Gradle Plugin 3.3 and above.
+     */
+    private fun GenerateTask.setupDependency(variant: BaseVariant) {
+        try {
+            dependsOn(variant.mergeAssetsProvider)
+        } catch (ignored: Throwable) {
+            dependsOn(variant.mergeAssets)
+        }
+    }
+
+    private fun configureUnitTest(project: Project, variants: DomainObjectSet<out UnitTestVariant>, extension: Extension) {
+        val featuresDir = extension.unitTest.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" inside \"unitTest\" for pickle to work with unit tests")
+
+        configure(project, variants, extension, featuresDir, { _, dir -> File(dir) })
+    }
+
+    private fun configure(
+        project: Project,
+        variants: DomainObjectSet<out BaseVariant>,
+        extension: Extension,
+        featuresDir: String,
+        featureFn: (BaseVariant, String)->File,
+        setupDependency: (GenerateTask, BaseVariant) -> Unit = {_,_ -> }
+    ) {
         val packageName = extension.packageName ?: throw IllegalStateException("You must specify \"packageName\" for pickle")
         val strictMode = extension.strictMode
 
@@ -116,7 +164,7 @@ class PicklePlugin : Plugin<Project> {
 
             val task = project.tasks.create(taskName, GenerateTask::class.java).apply {
                 this.packageName = packageName
-                this.featuresDir = File(variant.resolveOutputDir(), featuresDir)
+                this.featuresDir = featureFn(variant, featuresDir)
                 this.strictMode = strictMode
                 this.hashClassFile = File(outputDir, "PickleHash.java")
             }
@@ -133,7 +181,7 @@ class PicklePlugin : Plugin<Project> {
      *
      * Remove this when we want to only support Android Gradle Plugin 3.4 and above.
      */
-    private fun TestVariant.resolveOutputDir(): File {
+    private fun BaseVariant.resolveOutputDir(): File {
         return try {
             val taskProvider = method(this, Any::class.java, "getMergeAssetsProvider").invoke(this)
             val mergeAssets = method(taskProvider, MergeSourceSetFolders::class.java, "get").invoke(taskProvider)
@@ -141,21 +189,6 @@ class PicklePlugin : Plugin<Project> {
             (outputDirProvider.get() as Directory).asFile
         } catch (ignored: Throwable) {
             mergeAssets.outputDir
-        }
-    }
-
-    /**
-     * Setup Pickle task dependency in a backward compatible way.
-     *
-     * mergeAssetsProvider was only introduced by Android Gradle Plugin 3.3.
-     *
-     * Remove this when we want to only support Android Gradle Plugin 3.3 and above.
-     */
-    private fun setupDependency(task: GenerateTask, variant: TestVariant) {
-        try {
-            task.dependsOn(variant.mergeAssetsProvider)
-        } catch (ignored: Throwable) {
-            task.dependsOn(variant.mergeAssets)
         }
     }
 }

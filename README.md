@@ -45,17 +45,18 @@ Make sure to apply this plugin **before** the kotlin plugin, if using one.
 apply plugin: 'com.fourlastor.pickle'
 
 pickle {
-    featuresDir = 'features' // location of features inside `androidTest/src/assets`
     packageName = 'com.example.test' // package where tests will be generated
     strictMode = true // activate/deactivate strict mode (defaults to true)
-    androidTest = true // enables pickle on androidTest (defaults to true)
-    unitTest = false // enables pickle on unit tests (defaults to false)
-    unitTestFeaturesDir = project.file('src/test/features') // absolute path to location of feature files for unit tests
+    androidTest {
+      enabled = true // enables pickle on androidTest (defaults to true)
+      featuresDir = 'features' // location of features inside `androidTest/src/assets`
+    }
+    unitTest {
+      enabled = false // enables pickle on unit tests (defaults to false)
+      featuresDir = project.file('src/test/features') // absolute path to location of feature files for unit tests
+    }
 }
 ```
-
-* `featuresDir` will be used for Android tests, it's a path inside the assets folder
-* `unitTestFeaturesDir` will be used for unit tests, it's an absolute path to your feature files
 
 Test will be generated and you can run them as you would run normal Android/unit tests :tada:
 

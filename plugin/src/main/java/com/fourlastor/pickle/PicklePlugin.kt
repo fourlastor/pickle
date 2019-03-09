@@ -80,14 +80,14 @@ class PicklePlugin : Plugin<Project> {
         }
     }
 
-    open class Extension {
-        var packageName: String? = null
-        var featuresDir: String? = null
-        var strictMode: Boolean = true
-        var androidTest: Boolean = true
-        var unitTest: Boolean = false
-        var unitTestFeaturesDir: String? = null
-    }
+    open class Extension(
+        var packageName: String? = null,
+        var strictMode: Boolean = true,
+        var androidTest: TestExtension = TestExtension(true),
+        var unitTest: TestExtension = TestExtension(false)
+    )
+
+    open class TestExtension(var enabled: Boolean, var featuresDir: String? = null)
 
     override fun apply(project: Project) {
         val extension = project.extensions.create("pickle", Extension::class.java)
@@ -97,20 +97,20 @@ class PicklePlugin : Plugin<Project> {
                 when (plugin) {
                     is LibraryPlugin -> {
                         project.extensions.findByType(LibraryExtension::class.java)?.run {
-                            if (extension.androidTest) {
+                            if (extension.androidTest.enabled) {
                                 configureAndroidTest(project, testVariants, extension)
                             }
-                            if (extension.unitTest) {
+                            if (extension.unitTest.enabled) {
                                 configureUnitTest(project, unitTestVariants, extension)
                             }
                         }
                     }
                     is AppPlugin -> {
                         project.extensions.findByType(AppExtension::class.java)?.run {
-                            if (extension.androidTest) {
+                            if (extension.androidTest.enabled) {
                                 configureAndroidTest(project, testVariants, extension)
                             }
-                            if (extension.unitTest) {
+                            if (extension.unitTest.enabled) {
                                 configureUnitTest(project, unitTestVariants, extension)
                             }
                         }
@@ -121,7 +121,7 @@ class PicklePlugin : Plugin<Project> {
     }
 
     private fun configureAndroidTest(project: Project, variants: DomainObjectSet<out TestVariant>, extension: Extension) {
-        val featuresDir = extension.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" for pickle to work with Android tests")
+        val featuresDir = extension.androidTest.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" inside \"androidTest\" for pickle to work with Android tests")
 
         configure(project, variants, extension, featuresDir, { variant, dir -> File(variant.resolveOutputDir(), dir) }, { task, variant -> task.setupDependency(variant) })
     }
@@ -142,7 +142,7 @@ class PicklePlugin : Plugin<Project> {
     }
 
     private fun configureUnitTest(project: Project, variants: DomainObjectSet<out UnitTestVariant>, extension: Extension) {
-        val featuresDir = extension.unitTestFeaturesDir ?: throw IllegalStateException("You must specify \"unitTestFeaturesDir\" for pickle to work with unit tests")
+        val featuresDir = extension.unitTest.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" inside \"unitTest\" for pickle to work with unit tests")
 
         configure(project, variants, extension, featuresDir, { _, dir -> File(dir) })
     }

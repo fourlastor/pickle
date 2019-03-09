@@ -10,7 +10,7 @@ Add this to your app `build.gradle` dependencies.
 
 ```gradle
 
-ext.pickleVersion = '1.1.1'
+ext.pickleVersion = '1.2.1'
 
 buildscript {
   repositories {
@@ -31,6 +31,8 @@ dependencies {
 
 }
 
+If you enable pickle on unit tests (see configuration below), remember to apply the annotation processor on your test variant!
+
 ```
 
 ## Configuration
@@ -43,13 +45,20 @@ Make sure to apply this plugin **before** the kotlin plugin, if using one.
 apply plugin: 'com.fourlastor.pickle'
 
 pickle {
-    featuresDir = 'features' // location of features inside `androidTest/src/assets`
     packageName = 'com.example.test' // package where tests will be generated
-    strictMode = false // activate/deactivate strict mode (optional, defaults to true)
+    strictMode = true // activate/deactivate strict mode (defaults to true)
+    androidTest {
+      enabled = true // enables pickle on androidTest (defaults to true)
+      featuresDir = 'features' // location of features inside `androidTest/src/assets`
+    }
+    unitTest {
+      enabled = false // enables pickle on unit tests (defaults to false)
+      featuresDir = project.file('src/test/features') // absolute path to location of feature files for unit tests
+    }
 }
 ```
 
-Test will be generated and you can run them as you would run normal Android Tests :tada:
+Test will be generated and you can run them as you would run normal Android/unit tests :tada:
 
 Disabling strict mode will generate tests only for defined scenarios, a scenario is considered defined if all the steps and background steps for that scenario are defined. The default behavior (strict) will fail at compile time if some scenarios aren't defined.
 

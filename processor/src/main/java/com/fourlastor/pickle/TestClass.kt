@@ -12,7 +12,14 @@ data class TestClass(
 )
 
 data class HookMethod(val annotation: ClassName, val name: String, val statements: List<TestMethodStatement>)
-data class TestMethod(val name: String, val statements: List<TestMethodStatement>)
+
+sealed class TestMethod {
+    abstract val name: String
+}
+
+data class IgnoredTestMethod(override val name: String, val scenarioName: String) : TestMethod()
+data class ImplementedTestMethod(override val name: String, val statements: List<TestMethodStatement>) : TestMethod()
+
 data class TestMethodStatement(val field: TestField, val statementFormat: String, val args: List<Any>)
 data class TestField(val type: TypeElement) {
     val name: String

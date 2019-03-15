@@ -11,7 +11,7 @@ class ClassConverter(
         val methods = methodsConverter.convert(feature.featureElements)
         val hooks = hooksCreator.create()
 
-        val fields = methods.flatMap { it.statements }
+        val fields = methods.filterIsInstance(ImplementedTestMethod::class.java).flatMap { it.statements }
                 .plus(hooks.flatMap { it.statements })
                 .map { it.field }
                 .toSet()

@@ -3,7 +3,7 @@ package com.fourlastor.pickle
 import cucumber.runtime.model.CucumberScenario
 import cucumber.runtime.model.CucumberScenarioOutline
 import cucumber.runtime.model.CucumberTagStatement
-import java.util.Collections
+import java.util.*
 import javax.annotation.processing.Messager
 import javax.tools.Diagnostic
 
@@ -21,15 +21,17 @@ class MethodsConverter(
         return statements.flatMap { statement ->
             when (statement) {
                 is CucumberScenario -> {
-                    val methodName = statement.gherkinModel.name.toCamelCase().decapitalize()
-                    val method = statement.convertToMethod(methodName)
+                    val scenarioName = statement.gherkinModel.name
+                    val methodName = scenarioName.toCamelCase().decapitalize()
+                    val method = statement.convertToMethod(methodName, scenarioName)
                     Collections.singletonList(method)
                 }
                 is CucumberScenarioOutline -> {
                     statement.cucumberExamplesList.flatMap {
                         it.createExampleScenarios().mapIndexed { index, scenario ->
-                            val methodName = "${scenario.gherkinModel.name.toCamelCase().decapitalize()}$index"
-                            scenario.convertToMethod(methodName)
+                            val scenarioName = scenario.gherkinModel.name
+                            val methodName = "${scenarioName.toCamelCase().decapitalize()}$index"
+                            scenario.convertToMethod(methodName, scenarioName)
                         }
                     }
                 }
@@ -41,14 +43,14 @@ class MethodsConverter(
     private fun List<CucumberTagStatement>.findDuplicates() =
             groupingBy { it.visualName }.eachCount().filterValues { it > 1 }.keys
 
-    private fun CucumberScenario.convertToMethod(name: String): TestMethod? {
+    private fun CucumberScenario.convertToMethod(name: String, scenarioName: String): TestMethod {
         return try {
             methodConverter.convert(name, this)
         } catch (e: MissingStepDefinitionException) {
             if (strictMode) {
                 propagate(e)
             }
-            skipMethod().also {
+            methodConverter.ignoredTest(name, scenarioName).also {
                 messager.warning("""
                     ${e.message}
                     "${gherkinModel.keyword}: ${gherkinModel.name}" will be skipped.
@@ -58,8 +60,6 @@ class MethodsConverter(
     }
 
     private fun propagate(e: MissingStepDefinitionException): Nothing = throw e
-
-    private fun skipMethod() = null
 
     private fun Messager.warning(message: String) {
         printMessage(Diagnostic.Kind.WARNING, message)

@@ -10,7 +10,7 @@ publish {
     userOrg = 'fourlastor'
     groupId = 'com.fourlastor'
     artifactId = 'pickle-plugin'
-    publishVersion = '1.2.1'
+    publishVersion = '1.3.0'
     desc = 'Cucumber implementation via code generation (plugin)'
     website = 'https://github.com/fourlastor/pickle'
 }

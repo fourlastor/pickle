@@ -60,7 +60,7 @@ pickle {
 
 Test will be generated and you can run them as you would run normal Android/unit tests :tada:
 
-Disabling strict mode will generate tests only for defined scenarios, a scenario is considered defined if all the steps and background steps for that scenario are defined. The default behavior (strict) will fail at compile time if some scenarios aren't defined.
+Disabling strict mode will generate tests only for scenario having all the steps/background steps defined, and empty tests annotated with `@Ignore` for scenario with missing steps. The default behavior (strict) will fail at compile time if some scenarios are missing any step.
 
 ## Modules
 

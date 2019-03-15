@@ -10,6 +10,7 @@ class ClassGenerator {
 
     companion object {
         private val Test = ClassName.bestGuess("org.junit.Test")!!
+        private val Ignore = ClassName.bestGuess("org.junit.Ignore")!!
         private val RunWith = ClassName.bestGuess("org.junit.runner.RunWith")
         private val AndroidJUnit4 = ClassName.bestGuess("android.support.test.runner.AndroidJUnit4")
     }
@@ -40,10 +41,14 @@ class ClassGenerator {
                 addModifiers(Modifier.PUBLIC)
                 addException(Throwable::class.java)
                 addAnnotation(Test)
-
-                code {
-                    method.statements.forEach {
-                        addStatement(it.statementFormat, *it.args.toTypedArray())
+                when (method) {
+                    is IgnoredTestMethod -> {
+                        addAnnotation(ignore(method.scenarioName))
+                    }
+                    is ImplementedTestMethod -> {
+                        method.statements.forEach {
+                            addStatement(it.statementFormat, *it.args.toTypedArray())
+                        }
                     }
                 }
             }
@@ -52,6 +57,10 @@ class ClassGenerator {
         testClass.fields.map { it.toFieldSpec() }
                 .forEach { addField(it) }
     }
+
+    private fun ignore(scenarioName: String) = AnnotationSpec.builder(Ignore)
+            .addMember("value", "\$S", "Missing steps for scenario \"$scenarioName\"")
+            .build()
 
     private fun TypeSpec.Builder.runWithJUnit4() = addAnnotation(
             AnnotationSpec.builder(RunWith)

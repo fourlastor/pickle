@@ -2,10 +2,24 @@
 
 ## [Unreleased](https://github.com/fourlastor/pickle/tree/HEAD)
 
-[Full Changelog](https://github.com/fourlastor/pickle/compare/v1.2.1...HEAD)
+[Full Changelog](https://github.com/fourlastor/pickle/compare/v1.3.0...HEAD)
+
+**Closed issues:**
+
+- Logo design [\#35](https://github.com/fourlastor/pickle/issues/35)
+
+## [v1.3.0](https://github.com/fourlastor/pickle/tree/v1.3.0) (2019-03-15)
+[Full Changelog](https://github.com/fourlastor/pickle/compare/v1.2.1...v1.3.0)
+
+**Closed issues:**
+
+- Non-strict mode suggestion [\#28](https://github.com/fourlastor/pickle/issues/28)
 
 **Merged pull requests:**
 
+- Bump to 1.3.0 [\#33](https://github.com/fourlastor/pickle/pull/33) ([fourlastor](https://github.com/fourlastor))
+- Add ignored tests when in non strict mode [\#32](https://github.com/fourlastor/pickle/pull/32) ([fourlastor](https://github.com/fourlastor))
+- Add changelog [\#31](https://github.com/fourlastor/pickle/pull/31) ([fourlastor](https://github.com/fourlastor))
 - Bump to 1.2.1 [\#30](https://github.com/fourlastor/pickle/pull/30) ([fourlastor](https://github.com/fourlastor))
 - Allow running pickle on unit tests [\#18](https://github.com/fourlastor/pickle/pull/18) ([fourlastor](https://github.com/fourlastor))
 

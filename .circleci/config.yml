@@ -58,6 +58,12 @@ jobs:
       - restore_workspace
       - gradle_cache
       - run: ./gradlew test
+  deploy_bintray:
+    executor: java-8
+    steps:
+      - restore_workspace
+      - gradle_cache
+      - run: ./gradlew bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PdryRun=false
 workflows:
   version: 2
   build-test:
@@ -69,3 +75,35 @@ workflows:
       - test:
           requires:
             - build
+  build-deploy:
+    jobs:
+      - checkout:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - build:
+          requires:
+            - checkout
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - deploy_bintray:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/

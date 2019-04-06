@@ -10,7 +10,7 @@ Add this to your app `build.gradle` dependencies.
 
 ```gradle
 
-ext.pickleVersion = '1.3.0'
+ext.pickleVersion = '1.3.1'
 
 buildscript {
   repositories {
@@ -31,9 +31,9 @@ dependencies {
 
 }
 
-If you enable pickle on unit tests (see configuration below), remember to apply the annotation processor on your test variant!
-
 ```
+
+If you enable pickle on unit tests (see configuration below), remember to apply the annotation processor on your test variant!
 
 ## Configuration
 

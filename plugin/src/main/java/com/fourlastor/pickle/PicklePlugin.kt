@@ -13,10 +13,7 @@ import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
-import org.gradle.api.DefaultTask
-import org.gradle.api.DomainObjectSet
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import org.gradle.api.*
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
@@ -81,11 +78,14 @@ class PicklePlugin : Plugin<Project> {
     }
 
     open class Extension(
-        var packageName: String? = null,
-        var strictMode: Boolean = true,
-        var androidTest: TestExtension = TestExtension(true),
-        var unitTest: TestExtension = TestExtension(false)
-    )
+            var packageName: String? = null,
+            var strictMode: Boolean = true,
+            var androidTest: TestExtension = TestExtension(true),
+            var unitTest: TestExtension = TestExtension(false)
+    ) {
+        fun androidTest(action: Action<TestExtension>) = action.execute(androidTest)
+        fun unitTest(action: Action<TestExtension>) = action.execute(unitTest)
+    }
 
     open class TestExtension(var enabled: Boolean, var featuresDir: String? = null)
 

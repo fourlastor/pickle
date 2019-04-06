@@ -1,5 +1,9 @@
 # Pickle
 
+| Lib | Plugin | Processor |
+| --- | --- | --- |
+| [ ![Download](https://api.bintray.com/packages/fourlastor/maven/pickle-lib/images/download.svg) ](https://bintray.com/fourlastor/maven/pickle-lib/_latestVersion) | [ ![Download](https://api.bintray.com/packages/fourlastor/maven/pickle-plugin/images/download.svg) ](https://bintray.com/fourlastor/maven/pickle-plugin/_latestVersion) | [ ![Download](https://api.bintray.com/packages/fourlastor/maven/pickle-processor/images/download.svg) ](https://bintray.com/fourlastor/maven/pickle-processor/_latestVersion) |
+
 Pickle is an implementation of Cucumber for Android which generates the tests classes at compile time instead of runtime.
 
 The main advantage over [cucumber-android](https://github.com/cucumber/cucumber-android) is that you won't need to use a different instrumentation runner for your Cucumber tests, and that, being generated, you can debug and inspect the tests, which makes it easier to debug errors.

@@ -26,7 +26,8 @@ buildscript {
   }
 }
 
-dependencies {
+dependencies { 
+  androidTestImplementation "io.cucumber:cucumber-java:$cucumberVersion"
   androidTestImplementation "com.fourlastor:pickle-lib:$pickleVersion"
   androidTestAnnotationProcessor "com.fourlastor:pickle-processor:$pickleVersion"
   

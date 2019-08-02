@@ -11,3 +11,6 @@ publish {
     desc = 'Cucumber implementation via code generation (library)'
     website = 'https://github.com/fourlastor/pickle'
 }
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7

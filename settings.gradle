@@ -1,1 +1,1 @@
-include ':processor', ':lib', ':plugin'
+include ':pickle-processor', ':pickle-lib', ':pickle-plugin'

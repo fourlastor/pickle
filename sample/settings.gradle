@@ -1,0 +1,4 @@
+rootProject.name = 'Pickle Sample'
+include ':app-kotlin'
+include ':app-java'
+includeBuild '../'

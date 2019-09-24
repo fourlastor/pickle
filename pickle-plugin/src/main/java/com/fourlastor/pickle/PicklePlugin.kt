@@ -7,15 +7,12 @@ import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.api.UnitTestVariant
-import com.android.build.gradle.tasks.MergeSourceSetFolders
-import com.fourlastor.pickle.JavaMethod.method
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.TypeSpec
 import org.gradle.api.*
-import org.gradle.api.file.Directory
-import org.gradle.api.provider.Provider
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFile
@@ -31,7 +28,7 @@ class PicklePlugin : Plugin<Project> {
         lateinit var packageName: String
 
         @InputDirectory
-        lateinit var featuresDir: File
+        val featuresDir: DirectoryProperty = project.objects.directoryProperty()
 
         @Input
         var strictMode: Boolean? = null
@@ -41,6 +38,7 @@ class PicklePlugin : Plugin<Project> {
 
         @TaskAction
         fun generateSources() {
+            val featuresDir = featuresDir.get().asFile
             val hashCodeValue = featuresDir
                     .walkTopDown()
                     .filter { !it.isDirectory && it.name.endsWith(".feature", ignoreCase = true) }
@@ -71,8 +69,8 @@ class PicklePlugin : Plugin<Project> {
 
             hashClassFile.writer().use {
                 JavaFile.builder(packageName, hashClass)
-                        .build()
-                        .writeTo(it)
+                    .build()
+                    .writeTo(it)
             }
         }
     }
@@ -121,39 +119,28 @@ class PicklePlugin : Plugin<Project> {
     }
 
     private fun configureAndroidTest(project: Project, variants: DomainObjectSet<out TestVariant>, extension: Extension) {
-        val featuresDir = extension.androidTest.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" inside \"androidTest\" for pickle to work with Android tests")
+        val featuresDir = extension.androidTest.featuresDir
+            ?: throw IllegalStateException("You must specify \"featuresDir\" inside \"androidTest\" for pickle to work with Android tests")
 
-        configure(project, variants, extension, featuresDir, { variant, dir -> File(variant.resolveOutputDir(), dir) }, { task, variant -> task.setupDependency(variant) })
-    }
-
-    /**
-     * Setup Pickle task dependency in a backward compatible way.
-     *
-     * mergeAssetsProvider was only introduced by Android Gradle Plugin 3.3.
-     *
-     * Remove this when we want to only support Android Gradle Plugin 3.3 and above.
-     */
-    private fun GenerateTask.setupDependency(variant: BaseVariant) {
-        try {
-            dependsOn(variant.mergeAssetsProvider)
-        } catch (ignored: Throwable) {
-            dependsOn(variant.mergeAssets)
+        configure(project, variants, extension) { variant, directoryProperty ->
+            directoryProperty.set(variant.mergeAssetsProvider.flatMap { it.outputDir.dir(featuresDir) })
         }
     }
 
     private fun configureUnitTest(project: Project, variants: DomainObjectSet<out UnitTestVariant>, extension: Extension) {
-        val featuresDir = extension.unitTest.featuresDir ?: throw IllegalStateException("You must specify \"featuresDir\" inside \"unitTest\" for pickle to work with unit tests")
+        val featuresDir = extension.unitTest.featuresDir
+            ?: throw IllegalStateException("You must specify \"featuresDir\" inside \"unitTest\" for pickle to work with unit tests")
 
-        configure(project, variants, extension, featuresDir, { _, dir -> File(dir) })
+        configure(project, variants, extension) { _, directoryProperty ->
+            directoryProperty.set(File(featuresDir))
+        }
     }
 
     private fun configure(
         project: Project,
         variants: DomainObjectSet<out BaseVariant>,
         extension: Extension,
-        featuresDir: String,
-        featureFn: (BaseVariant, String)->File,
-        setupDependency: (GenerateTask, BaseVariant) -> Unit = {_,_ -> }
+        featureFn: (BaseVariant, DirectoryProperty) -> Unit
     ) {
         val packageName = extension.packageName ?: throw IllegalStateException("You must specify \"packageName\" for pickle")
         val strictMode = extension.strictMode
@@ -162,33 +149,13 @@ class PicklePlugin : Plugin<Project> {
             val outputDir = project.buildDir.resolve("generated/source/pickle/${variant.dirName}")
             val taskName = "generatePickleHashClass" + variant.name.capitalize()
 
-            val task = project.tasks.create(taskName, GenerateTask::class.java).apply {
-                this.packageName = packageName
-                this.featuresDir = featureFn(variant, featuresDir)
-                this.strictMode = strictMode
-                this.hashClassFile = File(outputDir, "PickleHash.java")
+            project.tasks.create(taskName, GenerateTask::class.java) { task ->
+                task.packageName = packageName
+                featureFn(variant, task.featuresDir)
+                task.strictMode = strictMode
+                task.hashClassFile = File(outputDir, "PickleHash.java")
+                variant.registerJavaGeneratingTask(task, outputDir)
             }
-
-            setupDependency(task, variant)
-            variant.registerJavaGeneratingTask(task, outputDir)
-        }
-    }
-
-    /**
-     * Resolve mergeAssets task outputDir in a backward compatible way.
-     *
-     * Reflection is needed since Google changed the type of a public getter in an incompatible way.
-     *
-     * Remove this when we want to only support Android Gradle Plugin 3.4 and above.
-     */
-    private fun BaseVariant.resolveOutputDir(): File {
-        return try {
-            val taskProvider = method(this, Any::class.java, "getMergeAssetsProvider").invoke(this)
-            val mergeAssets = method(taskProvider, MergeSourceSetFolders::class.java, "get").invoke(taskProvider)
-            val outputDirProvider = method(mergeAssets, Provider::class.java, "getOutputDir").invoke(mergeAssets)
-            (outputDirProvider.get() as Directory).asFile
-        } catch (ignored: Throwable) {
-            mergeAssets.outputDir
         }
     }
 }

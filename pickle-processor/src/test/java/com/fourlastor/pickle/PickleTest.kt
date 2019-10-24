@@ -71,6 +71,28 @@ class PickleTest {
     }
 
     @Test
+    fun featureWithAllDefinedStepsMissingInNonStrictMode() {
+        val packageName = "targetForNonStrictModeAllStepsMissing"
+
+        val compilation = whenCompilingWith(
+                featuresDir,
+                packageName,
+                nonStrict
+        )
+
+        assertThat(compilation).succeeded()
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step without parameters\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step with 1 as parameter\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step with 2 as parameter\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step without parameters\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step with 1 as parameter\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step with a as parameter\"")
+        assertThat(compilation).successfullyGeneratedTestClasses(
+                "$packageName/AFeatureWithoutBackgroundTest.java"
+        )
+    }
+
+    @Test
     fun featureWithDefinedStepsAndHooks() {
         val packageName = "targetWithHooks"
         val compilation = whenCompilingWith(

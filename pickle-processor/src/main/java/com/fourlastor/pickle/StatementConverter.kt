@@ -66,7 +66,7 @@ private fun RoundEnvironment.getStepDefinitions(): List<StepDefinition> {
 
 private data class StepDefinition(val element: ExecutableElement, val regex: Regex)
 
-class StepDefinitionArgumentsMismatchException(stepName: String, element: ExecutableElement) : RuntimeException("""
+class StepDefinitionArgumentsMismatchException(stepName: String, element: ExecutableElement) : PickleException("""
     Step definition argument mismatch.
     > Step definition: "$stepName"
     > Step implementation: ${element.enclosingElement}.$element

@@ -32,7 +32,7 @@ class PickleProcessor : AbstractProcessor() {
                         .map { generator.generate(it) }
                         .forEach { writer.write(it) }
             }
-        } catch (exception: Exception) {
+        } catch (exception: PickleException) {
             processingEnv.messager.error("""
                 Pickle Error:
                 ${exception.message}

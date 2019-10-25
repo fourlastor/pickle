@@ -21,4 +21,4 @@ class FeatureParser {
     }
 }
 
-class FeatureFilesPathIsNotDirectoryException(path: String) : RuntimeException("$path is not a directory")
+class FeatureFilesPathIsNotDirectoryException(path: String) : PickleException("$path is not a directory")

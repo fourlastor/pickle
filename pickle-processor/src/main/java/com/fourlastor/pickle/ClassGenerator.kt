@@ -84,4 +84,4 @@ class ClassGenerator {
     }
 }
 
-class MissingStepDefinitionException(stepName: String) : RuntimeException("Missing step definition for \"$stepName\"")
+class MissingStepDefinitionException(stepName: String) : PickleException("Missing step definition for \"$stepName\"")

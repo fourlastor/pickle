@@ -32,7 +32,7 @@ class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
             when (val annotation = getAnnotation(annotationType)) {
                 is Before -> annotation.order
                 is After -> annotation.order
-                else -> throw IllegalStateException("Unexpected Cucumber annotation used: $annotationType")
+                else -> throw PickleException("Unexpected Cucumber annotation used: $annotationType")
             }
 }
 

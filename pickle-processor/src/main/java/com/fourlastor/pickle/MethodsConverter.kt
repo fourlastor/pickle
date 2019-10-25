@@ -3,7 +3,7 @@ package com.fourlastor.pickle
 import cucumber.runtime.model.CucumberScenario
 import cucumber.runtime.model.CucumberScenarioOutline
 import cucumber.runtime.model.CucumberTagStatement
-import java.util.*
+import java.util.Collections
 import javax.annotation.processing.Messager
 import javax.tools.Diagnostic
 
@@ -67,9 +67,9 @@ class MethodsConverter(
     }
 }
 
-class UnsupportedStatementException(type: String) : IllegalArgumentException("Statements of type \"$type\" aren't supported")
+class UnsupportedStatementException(type: String) : PickleException("Statements of type \"$type\" aren't supported")
 
-class DuplicateScenarioException(duplicateScenarios: Collection<String>) : RuntimeException("""
+class DuplicateScenarioException(duplicateScenarios: Collection<String>) : PickleException("""
     Scenarios need to have unique names.
     Duplicate scenarios:
     ${duplicateScenarios.joinToString(separator = "\n") { "> $it" }}

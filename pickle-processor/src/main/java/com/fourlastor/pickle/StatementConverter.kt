@@ -78,7 +78,7 @@ class StepDefinitionArgumentsMismatchException(stepName: String, element: Execut
     > Step implementation: ${element.enclosingElement}.$element
 """.trimIndent())
 
-class AmbiguousStepDefinitionException(stepName: String, matching: List<Regex>) : RuntimeException("""
+class AmbiguousStepDefinitionException(stepName: String, matching: List<Regex>) : PickleException("""
     Multiple step implementations matched.
     > Step definition: "$stepName"
     > Step implementation with regexes:

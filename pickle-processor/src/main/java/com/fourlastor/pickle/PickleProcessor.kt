@@ -1,10 +1,8 @@
 package com.fourlastor.pickle
 
-import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Messager
-import javax.annotation.processing.RoundEnvironment
-import javax.annotation.processing.SupportedAnnotationTypes
-import javax.annotation.processing.SupportedSourceVersion
+import java.io.PrintWriter
+import java.io.StringWriter
+import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
@@ -34,9 +32,16 @@ class PickleProcessor : AbstractProcessor() {
             }
         } catch (exception: PickleException) {
             processingEnv.messager.error("Pickle Error:\n${exception.message}\n")
+        } catch (exception: Exception) {
+            processingEnv.messager.error("Pickle Error:\n${exception.message}\n${exception.getStrackTraceAsString()}\n")
         } finally {
             return false
         }
+    }
+
+    private fun Exception.getStrackTraceAsString() = StringWriter().let {
+        printStackTrace(PrintWriter(it))
+        it.toString()
     }
 
     private fun Options.createClassConverter(roundEnv: RoundEnvironment, messager: Messager): ClassConverter {

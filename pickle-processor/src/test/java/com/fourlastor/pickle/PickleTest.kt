@@ -52,6 +52,25 @@ class PickleTest {
     }
 
     @Test
+    fun featureWithAmbiguousDefinedStepsInStrictMode() {
+        val compilation = whenCompilingWith(
+                featuresDir,
+                "target",
+                strict,
+                "steps/Steps.java",
+                "steps/OtherSteps.java",
+                "steps/OtherStepsWithAmbiguousStep.java"
+        )
+
+        assertThat(compilation).failed()
+        assertThat(compilation).hadErrorContaining("Multiple step implementations matched.")
+        assertThat(compilation).hadErrorContaining("> Step definition: \"A step with 1 as parameter\"")
+        assertThat(compilation).hadErrorContaining("> Step implementation with regexes:")
+        assertThat(compilation).hadErrorContaining("^A step with (\\w+) as parameter$")
+        assertThat(compilation).hadErrorContaining("^A step with (\\w?) as parameter$")
+    }
+
+    @Test
     fun featureWithMissingDefinedStepsInNonStrictMode() {
         val packageName = "targetForNonStrictMode"
 

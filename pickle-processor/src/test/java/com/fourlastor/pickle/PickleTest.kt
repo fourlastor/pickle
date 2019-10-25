@@ -52,6 +52,25 @@ class PickleTest {
     }
 
     @Test
+    fun featureWithAmbiguousDefinedStepsInStrictMode() {
+        val compilation = whenCompilingWith(
+                featuresDir,
+                "target",
+                strict,
+                "steps/Steps.java",
+                "steps/OtherSteps.java",
+                "steps/OtherStepsWithAmbiguousStep.java"
+        )
+
+        assertThat(compilation).failed()
+        assertThat(compilation).hadErrorContaining("Multiple step implementations matched.")
+        assertThat(compilation).hadErrorContaining("> Step definition: \"A step with 1 as parameter\"")
+        assertThat(compilation).hadErrorContaining("> Step implementation with regexes:")
+        assertThat(compilation).hadErrorContaining("^A step with (\\w+) as parameter$")
+        assertThat(compilation).hadErrorContaining("^A step with (\\w?) as parameter$")
+    }
+
+    @Test
     fun featureWithMissingDefinedStepsInNonStrictMode() {
         val packageName = "targetForNonStrictMode"
 
@@ -65,6 +84,28 @@ class PickleTest {
         assertThat(compilation).succeeded()
         assertThat(compilation).hadWarningContaining("Missing step definition for \"A step from another definition file\"")
         assertThat(compilation).hadWarningContaining("\"Scenario: Scenario with one step and background\" will be skipped.")
+        assertThat(compilation).successfullyGeneratedTestClasses(
+                "$packageName/AFeatureWithoutBackgroundTest.java"
+        )
+    }
+
+    @Test
+    fun featureWithAllDefinedStepsMissingInNonStrictMode() {
+        val packageName = "targetForNonStrictModeAllStepsMissing"
+
+        val compilation = whenCompilingWith(
+                featuresDir,
+                packageName,
+                nonStrict
+        )
+
+        assertThat(compilation).succeeded()
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step without parameters\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step with 1 as parameter\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step with 2 as parameter\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step without parameters\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step with 1 as parameter\"")
+        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step with a as parameter\"")
         assertThat(compilation).successfullyGeneratedTestClasses(
                 "$packageName/AFeatureWithoutBackgroundTest.java"
         )

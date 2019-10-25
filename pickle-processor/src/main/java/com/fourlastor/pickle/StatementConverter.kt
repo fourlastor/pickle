@@ -15,8 +15,14 @@ class StatementConverter(roundEnv: RoundEnvironment) {
     private val stepDefinitions = roundEnv.getStepDefinitions()
 
     fun convert(step: Step): TestMethodStatement {
-        val stepDefinition = stepDefinitions.find { it.regex.matches(step.name) } ?: throw MissingStepDefinitionException(step.name)
-
+        val matching = stepDefinitions.filter { it.regex.matches(step.name) }
+        if (matching.isEmpty()) {
+            throw MissingStepDefinitionException(step.name)
+        }
+        if (matching.size > 1) {
+            throw AmbiguousStepDefinitionException(step.name, matching.map(StepDefinition::regex))
+        }
+        val stepDefinition = matching[0]
         val field = createFieldFor(stepDefinition)
         return createStatement(stepDefinition, step, field)
     }
@@ -70,4 +76,11 @@ class StepDefinitionArgumentsMismatchException(stepName: String, element: Execut
     Step definition argument mismatch.
     > Step definition: "$stepName"
     > Step implementation: ${element.enclosingElement}.$element
+""".trimIndent())
+
+class AmbiguousStepDefinitionException(stepName: String, matching: List<Regex>) : RuntimeException("""
+    Multiple step implementations matched.
+    > Step definition: "$stepName"
+    > Step implementation with regexes:
+    ${matching.joinToString(separator = "\n    ")}
 """.trimIndent())

@@ -19,6 +19,10 @@ class ClassGenerator {
         runWithJUnit4()
         addModifiers(Modifier.PUBLIC)
 
+        if (testClass.isAllTestsIgnored()) {
+            addAnnotation(AnnotationSpec.builder(Ignore).build())
+        }
+
         testClass.hookMethods
                 .filter { it.statements.isNotEmpty() }
                 .forEach { hook ->
@@ -57,6 +61,8 @@ class ClassGenerator {
         testClass.fields.map { it.toFieldSpec() }
                 .forEach { addField(it) }
     }
+
+    private fun TestClass.isAllTestsIgnored() = methods.all { it is IgnoredTestMethod }
 
     private fun ignore(scenarioName: String) = AnnotationSpec.builder(Ignore)
             .addMember("value", "\$S", "Missing steps for scenario \"$scenarioName\"")

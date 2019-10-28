@@ -14,7 +14,7 @@ Add this to your app `build.gradle` dependencies.
 
 ```gradle
 
-ext.pickleVersion = '1.3.1'
+ext.pickleVersion = '1.3.2'
 ext.cucumberVersion = '4.4.0' // Last supported version. Do not use never versions since annotation packages were moved.
 
 buildscript {

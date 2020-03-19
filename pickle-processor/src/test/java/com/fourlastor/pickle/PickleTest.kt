@@ -216,7 +216,7 @@ class PickleTest {
             createClass("AndroidJUnit4") {
                 superclass(Runner::class.java)
                 addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-            }.asJavaFileObject("android.support.test.runner")
+            }.asJavaFileObject("androidx.test.ext.junit.runners")
 
     private fun TypeSpec.asJavaFileObject(packageName: String = "com.example"): JavaFileObject {
         val javaFile = JavaFile.builder(packageName, this)

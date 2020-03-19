@@ -54,7 +54,7 @@ reports/
 !/.idea/compiler.xml
 
 # IntelliJ
-/out/
+out/
 
 # Apple files
 .DS_Store

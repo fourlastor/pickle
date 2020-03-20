@@ -2,10 +2,30 @@
 
 ## [Unreleased](https://github.com/fourlastor/pickle/tree/HEAD)
 
-[Full Changelog](https://github.com/fourlastor/pickle/compare/v1.3.2...HEAD)
+[Full Changelog](https://github.com/fourlastor/pickle/compare/v2.0.0...HEAD)
 
 **Merged pull requests:**
 
+- Bump to v2.0.0 [\#62](https://github.com/fourlastor/pickle/pull/62) ([fourlastor](https://github.com/fourlastor))
+
+## [v2.0.0](https://github.com/fourlastor/pickle/tree/v2.0.0) (2020-03-20)
+
+[Full Changelog](https://github.com/fourlastor/pickle/compare/v1.3.2...v2.0.0)
+
+**Closed issues:**
+
+- Migrate to AndroidX [\#59](https://github.com/fourlastor/pickle/issues/59)
+- Support incremental annotation processing [\#56](https://github.com/fourlastor/pickle/issues/56)
+- Minor indentation issue with error output [\#21](https://github.com/fourlastor/pickle/issues/21)
+- Add demo project [\#1](https://github.com/fourlastor/pickle/issues/1)
+
+**Merged pull requests:**
+
+- Update kotlin version [\#61](https://github.com/fourlastor/pickle/pull/61) ([fourlastor](https://github.com/fourlastor))
+- Update test runner to androidx [\#60](https://github.com/fourlastor/pickle/pull/60) ([fourlastor](https://github.com/fourlastor))
+- Add readme instructions for samples [\#58](https://github.com/fourlastor/pickle/pull/58) ([fourlastor](https://github.com/fourlastor))
+- Make pickle an incremental annotation processor [\#57](https://github.com/fourlastor/pickle/pull/57) ([fourlastor](https://github.com/fourlastor))
+- Updated changelog for 1.3.2 [\#55](https://github.com/fourlastor/pickle/pull/55) ([fourlastor](https://github.com/fourlastor))
 - Update version to 1.3.2 [\#54](https://github.com/fourlastor/pickle/pull/54) ([fourlastor](https://github.com/fourlastor))
 
 ## [v1.3.2](https://github.com/fourlastor/pickle/tree/v1.3.2) (2019-10-28)

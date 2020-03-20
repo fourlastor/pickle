@@ -58,6 +58,7 @@ jobs:
       - restore_workspace
       - gradle_cache
       - run: ./gradlew test
+      - run: ./gradlew bintrayUpload -PbintrayUser=user -PbintrayKey=key -PdryRun=true
   deploy_bintray:
     executor: java-8
     steps:

@@ -1,6 +1,6 @@
 package targetWithSeparateHooks;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import java.lang.Throwable;
 import org.junit.After;
 import org.junit.Before;

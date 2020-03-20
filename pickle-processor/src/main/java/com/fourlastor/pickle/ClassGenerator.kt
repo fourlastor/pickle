@@ -12,7 +12,7 @@ class ClassGenerator {
         private val Test = ClassName.bestGuess("org.junit.Test")!!
         private val Ignore = ClassName.bestGuess("org.junit.Ignore")!!
         private val RunWith = ClassName.bestGuess("org.junit.runner.RunWith")
-        private val AndroidJUnit4 = ClassName.bestGuess("android.support.test.runner.AndroidJUnit4")
+        private val AndroidJUnit4 = ClassName.bestGuess("androidx.test.ext.junit.runners.AndroidJUnit4")
     }
 
     fun generate(testClass: TestClass) = createClass(testClass.name) {

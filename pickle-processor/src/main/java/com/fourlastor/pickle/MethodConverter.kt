@@ -9,7 +9,7 @@ class MethodConverter(private val statementConverter: StatementConverter) {
 
     fun convert(name: String, scenario: Scenario, background: Background?): ImplementedTestMethod {
         val statements = merge(background, scenario)
-            .map(statementConverter::convert)
+                .map(statementConverter::convert)
         return ImplementedTestMethod(name, statements)
     }
 
@@ -18,4 +18,4 @@ class MethodConverter(private val statementConverter: StatementConverter) {
 }
 
 private fun merge(background: Background?, scenario: Scenario): List<Step> =
-    background?.steps.orEmpty() + scenario.steps
+        background?.steps.orEmpty() + scenario.steps

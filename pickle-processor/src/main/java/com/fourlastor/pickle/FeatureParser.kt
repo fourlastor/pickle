@@ -12,13 +12,12 @@ internal class FeatureParser {
         }
 
         return featuresFileDir
-            .walkTopDown()
-            .filter { it.name.endsWith(".feature", ignoreCase = true) }
-            .map(::FileResource)
-            .map(FeatureParser::parseResource)
-            .toList()
+                .walkTopDown()
+                .filter { it.name.endsWith(".feature", ignoreCase = true) }
+                .map(::FileResource)
+                .map(FeatureParser::parseResource)
+                .toList()
     }
 }
 
-class FeatureFilesPathIsNotDirectoryException(path: String) :
-    PickleException("$path is not a directory")
+class FeatureFilesPathIsNotDirectoryException(path: String) : PickleException("$path is not a directory")

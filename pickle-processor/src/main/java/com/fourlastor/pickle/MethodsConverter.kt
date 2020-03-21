@@ -4,7 +4,6 @@ import gherkin.ast.Background
 import gherkin.ast.Scenario
 import gherkin.ast.ScenarioDefinition
 import gherkin.ast.ScenarioOutline
-import java.util.*
 import javax.annotation.processing.Messager
 import javax.tools.Diagnostic
 
@@ -27,10 +26,7 @@ class MethodsConverter(
 
         return scenarios.flatMap { scenario ->
             when (scenario) {
-                is Scenario -> {
-                    val method = scenario.convertToMethod(background)
-                    Collections.singletonList(method)
-                }
+                is Scenario -> listOf(scenario.convertToMethod(background))
                 is ScenarioOutline -> {
                     scenario.examples.flatMap {
                         it.toScenarios(scenario).mapIndexed { index, scenario ->
@@ -40,7 +36,7 @@ class MethodsConverter(
                 }
                 else -> throw UnsupportedStatementException(scenario::class.java.name)
             }
-        }.filterNotNull()
+        }
     }
 
     private fun List<ScenarioDefinition>.findDuplicates() =
@@ -55,13 +51,11 @@ class MethodsConverter(
                 propagate(e)
             }
             methodConverter.ignoredTest(methodName, name).also {
-                messager.warning(
-                        """
+                messager.warning("""
                     ${e.message}
                     "$keyword: $name" will be skipped.
                     
-                """.trimIndent()
-                )
+                """.trimIndent())
             }
         }
     }
@@ -75,8 +69,7 @@ class MethodsConverter(
 
 class UnsupportedStatementException(type: String) : PickleException("Statements of type \"$type\" aren't supported")
 
-class DuplicateScenarioException(duplicateScenarios: Collection<String>) : PickleException(
-        """
+class DuplicateScenarioException(duplicateScenarios: Collection<String>) : PickleException("""
     Scenarios need to have unique names.
     Duplicate scenarios:
     ${duplicateScenarios.joinToString(separator = "\n") { "> $it" }}

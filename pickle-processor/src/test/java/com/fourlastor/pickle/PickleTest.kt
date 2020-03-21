@@ -155,7 +155,7 @@ class PickleTest {
         assertThat(compilation).failed()
         assertThat(compilation).hadErrorContaining("Scenarios need to have unique names.")
         assertThat(compilation).hadErrorContaining("Duplicate scenarios:")
-        assertThat(compilation).hadErrorContaining("> Scenario: Duplicate scenario")
+        assertThat(compilation).hadErrorContaining("> Duplicate scenario")
     }
 
     @Test

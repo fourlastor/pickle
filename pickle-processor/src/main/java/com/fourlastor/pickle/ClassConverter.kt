@@ -8,7 +8,8 @@ class ClassConverter(
 ) {
 
     fun convert(feature: CucumberFeature): TestClass {
-        val methods = methodsConverter.convert(feature.featureElements)
+        val gherkinFeature = feature.gherkinFeature.feature
+        val methods = methodsConverter.convert(gherkinFeature.children)
         val hooks = hooksCreator.create()
 
         val fields = methods.filterIsInstance(ImplementedTestMethod::class.java).flatMap { it.statements }
@@ -17,7 +18,7 @@ class ClassConverter(
                 .toSet()
 
         return TestClass(
-                "${feature.gherkinFeature.name.toCamelCase()}Test",
+                "${gherkinFeature.name.toCamelCase()}Test",
                 hooks,
                 methods,
                 fields

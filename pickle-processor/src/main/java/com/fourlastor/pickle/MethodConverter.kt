@@ -1,18 +1,21 @@
 package com.fourlastor.pickle
 
-import cucumber.runtime.model.CucumberScenario
+import gherkin.ast.Background
+import gherkin.ast.Scenario
+import gherkin.ast.Step
+
 
 class MethodConverter(private val statementConverter: StatementConverter) {
 
-    fun convert(name: String, scenario: CucumberScenario) =
-            ImplementedTestMethod(name, createStatementsFor(scenario))
+    fun convert(name: String, scenario: Scenario, background: Background?): ImplementedTestMethod {
+        val statements = merge(background, scenario)
+            .map(statementConverter::convert)
+        return ImplementedTestMethod(name, statements)
+    }
 
     fun ignoredTest(name: String, scenarioName: String) = IgnoredTestMethod(name, scenarioName)
 
-    private fun createStatementsFor(scenario: CucumberScenario): List<TestMethodStatement> {
-        return scenario.stepsIncludingBackground()
-                .map { statementConverter.convert(it) }
-    }
 }
 
-private fun CucumberScenario.stepsIncludingBackground() = cucumberBackground?.steps.orEmpty() + steps
+private fun merge(background: Background?, scenario: Scenario): List<Step> =
+    background?.steps.orEmpty() + scenario.steps

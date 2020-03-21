@@ -4,7 +4,7 @@ import cucumber.api.java.en.And
 import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
-import gherkin.formatter.model.Step
+import gherkin.ast.Step
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
@@ -15,12 +15,12 @@ class StatementConverter(roundEnv: RoundEnvironment) {
     private val stepDefinitions = roundEnv.getStepDefinitions()
 
     fun convert(step: Step): TestMethodStatement {
-        val matching = stepDefinitions.filter { it.regex.matches(step.name) }
+        val matching = stepDefinitions.filter { it.regex.matches(step.text) }
         if (matching.isEmpty()) {
-            throw MissingStepDefinitionException(step.name)
+            throw MissingStepDefinitionException(step.text)
         }
         if (matching.size > 1) {
-            throw AmbiguousStepDefinitionException(step.name, matching.map(StepDefinition::regex))
+            throw AmbiguousStepDefinitionException(step.text, matching.map(StepDefinition::regex))
         }
         val stepDefinition = matching[0]
         val field = createFieldFor(stepDefinition)
@@ -33,12 +33,12 @@ class StatementConverter(roundEnv: RoundEnvironment) {
     }
 
     private fun createStatement(stepDefinition: StepDefinition, step: Step, stepsField: TestField): TestMethodStatement {
-        val matches = stepDefinition.regex.matchEntire(step.name) ?: throw MissingStepDefinitionException(step.name)
+        val matches = stepDefinition.regex.matchEntire(step.text) ?: throw MissingStepDefinitionException(step.text)
 
         val parameterValues = matches.groupValues.drop(1).toTypedArray()
         val parameterTypes = stepDefinition.element.parameters.map { it.asType() }
         if (parameterTypes.size != parameterValues.size) {
-            throw StepDefinitionArgumentsMismatchException(step.name, stepDefinition.element)
+            throw StepDefinitionArgumentsMismatchException(step.text, stepDefinition.element)
         }
         val parameterStringFormat = parameterTypes.joinToString(", ") { if (it.toString() == String::class.java.name) "\$S" else "\$L" }
         return testMethodStatement(

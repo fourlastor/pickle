@@ -35,7 +35,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
-    androidTestImplementation 'io.cucumber:cucumber-java:4.3.1'
+    androidTestImplementation "io.cucumber:cucumber-java:$cucumber_version"
     androidTestImplementation "com.fourlastor:pickle-lib"
     kaptAndroidTest "com.fourlastor:pickle-processor"
     androidTestImplementation 'androidx.test:runner:1.2.0'

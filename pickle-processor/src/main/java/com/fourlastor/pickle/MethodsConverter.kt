@@ -9,9 +9,9 @@ import javax.annotation.processing.Messager
 import javax.tools.Diagnostic
 
 class MethodsConverter(
-    private val methodConverter: MethodConverter,
-    private val strictMode: Boolean,
-    private val messager: Messager
+        private val methodConverter: MethodConverter,
+        private val strictMode: Boolean,
+        private val messager: Messager
 ) {
 
     fun convert(statements: List<ScenarioDefinition>): List<TestMethod> {
@@ -32,14 +32,11 @@ class MethodsConverter(
                     Collections.singletonList(method)
                 }
                 is ScenarioOutline -> {
-                    TODO()
-    //                    scenario.examples.flatMap {
-    //                        it.createExampleScenarios().mapIndexed { index, scenario ->
-    //                            val scenarioName = scenario.name
-    //                            val methodName = "${scenarioName.toCamelCase().decapitalize()}$index"
-    //                            scenario.convertToMethod(methodName, scenarioName)
-    //                        }
-    //                    }
+                    scenario.examples.flatMap {
+                        it.toScenarios(scenario).mapIndexed { index, scenario ->
+                            scenario.convertToMethod(background, index.toString())
+                        }
+                    }
                 }
                 else -> throw UnsupportedStatementException(scenario::class.java.name)
             }
@@ -47,10 +44,10 @@ class MethodsConverter(
     }
 
     private fun List<ScenarioDefinition>.findDuplicates() =
-        groupingBy { it.name }.eachCount().filterValues { it > 1 }.keys
+            groupingBy { it.name }.eachCount().filterValues { it > 1 }.keys
 
-    private fun Scenario.convertToMethod(background: Background?): TestMethod {
-        val methodName = name.toCamelCase().decapitalize()
+    private fun Scenario.convertToMethod(background: Background?, methodSuffix: String = ""): TestMethod {
+        val methodName = name.toCamelCase().decapitalize() + methodSuffix
         return try {
             methodConverter.convert(methodName, this, background)
         } catch (e: MissingStepDefinitionException) {
@@ -59,9 +56,9 @@ class MethodsConverter(
             }
             methodConverter.ignoredTest(methodName, name).also {
                 messager.warning(
-                    """
+                        """
                     ${e.message}
-                    "$keyword: $methodName" will be skipped.
+                    "$keyword: $name" will be skipped.
                     
                 """.trimIndent()
                 )
@@ -76,11 +73,10 @@ class MethodsConverter(
     }
 }
 
-class UnsupportedStatementException(type: String) :
-    PickleException("Statements of type \"$type\" aren't supported")
+class UnsupportedStatementException(type: String) : PickleException("Statements of type \"$type\" aren't supported")
 
 class DuplicateScenarioException(duplicateScenarios: Collection<String>) : PickleException(
-    """
+        """
     Scenarios need to have unique names.
     Duplicate scenarios:
     ${duplicateScenarios.joinToString(separator = "\n") { "> $it" }}

@@ -15,13 +15,13 @@ publish {
 
 dependencies {
     implementation 'info.cukes:cucumber-java:1.2.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.squareup:javapoet:1.9.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'com.squareup:javapoet:1.11.1'
     implementation project(':pickle-lib')
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'com.google.testing.compile:compile-testing:0.11'
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'com.google.testing.compile:compile-testing:0.15'
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-    testImplementation 'org.mockito:mockito-core:2.9.0'
+    testImplementation 'org.mockito:mockito-core:3.1.0'
     testImplementation files(Jvm.current().getToolsJar())
 }
 

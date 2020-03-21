@@ -1,9 +1,9 @@
 package com.fourlastor.pickle
 
-import cucumber.runtime.model.CucumberScenario
-import cucumber.runtime.model.CucumberScenarioOutline
-import cucumber.runtime.model.CucumberTagStatement
-import java.util.Collections
+import gherkin.ast.Background
+import gherkin.ast.Scenario
+import gherkin.ast.ScenarioDefinition
+import gherkin.ast.ScenarioOutline
 import javax.annotation.processing.Messager
 import javax.tools.Diagnostic
 
@@ -12,48 +12,48 @@ class MethodsConverter(
         private val strictMode: Boolean,
         private val messager: Messager
 ) {
-    fun convert(statements: List<CucumberTagStatement>): List<TestMethod> {
-        val duplicates = statements.findDuplicates()
+
+    fun convert(statements: List<ScenarioDefinition>): List<TestMethod> {
+        val background = statements.filterIsInstance<Background>().firstOrNull()
+        return convert(background, statements.filterNot { it == background })
+    }
+
+    private fun convert(background: Background?, scenarios: List<ScenarioDefinition>): List<TestMethod> {
+        val duplicates = scenarios.findDuplicates()
         if (duplicates.isNotEmpty()) {
             throw DuplicateScenarioException(duplicates)
         }
 
-        return statements.flatMap { statement ->
-            when (statement) {
-                is CucumberScenario -> {
-                    val scenarioName = statement.gherkinModel.name
-                    val methodName = scenarioName.toCamelCase().decapitalize()
-                    val method = statement.convertToMethod(methodName, scenarioName)
-                    Collections.singletonList(method)
-                }
-                is CucumberScenarioOutline -> {
-                    statement.cucumberExamplesList.flatMap {
-                        it.createExampleScenarios().mapIndexed { index, scenario ->
-                            val scenarioName = scenario.gherkinModel.name
-                            val methodName = "${scenarioName.toCamelCase().decapitalize()}$index"
-                            scenario.convertToMethod(methodName, scenarioName)
+        return scenarios.flatMap { scenario ->
+            when (scenario) {
+                is Scenario -> listOf(scenario.convertToMethod(background))
+                is ScenarioOutline -> {
+                    scenario.examples.flatMap {
+                        it.toScenarios(scenario).mapIndexed { index, scenario ->
+                            scenario.convertToMethod(background, index.toString())
                         }
                     }
                 }
-                else -> throw UnsupportedStatementException(statement::class.java.name)
+                else -> throw UnsupportedStatementException(scenario::class.java.name)
             }
-        }.filterNotNull()
+        }
     }
 
-    private fun List<CucumberTagStatement>.findDuplicates() =
-            groupingBy { it.visualName }.eachCount().filterValues { it > 1 }.keys
+    private fun List<ScenarioDefinition>.findDuplicates() =
+            groupingBy { it.name }.eachCount().filterValues { it > 1 }.keys
 
-    private fun CucumberScenario.convertToMethod(name: String, scenarioName: String): TestMethod {
+    private fun Scenario.convertToMethod(background: Background?, methodSuffix: String = ""): TestMethod {
+        val methodName = name.toCamelCase().decapitalize() + methodSuffix
         return try {
-            methodConverter.convert(name, this)
+            methodConverter.convert(methodName, this, background)
         } catch (e: MissingStepDefinitionException) {
             if (strictMode) {
                 propagate(e)
             }
-            methodConverter.ignoredTest(name, scenarioName).also {
+            methodConverter.ignoredTest(methodName, name).also {
                 messager.warning("""
                     ${e.message}
-                    "${gherkinModel.keyword}: ${gherkinModel.name}" will be skipped.
+                    "$keyword: $name" will be skipped.
                     
                 """.trimIndent())
             }

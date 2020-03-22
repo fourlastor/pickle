@@ -30,6 +30,6 @@ dependencies {
     androidTestImplementation "io.cucumber:cucumber-java:$cucumber_version"
     androidTestImplementation "com.fourlastor:pickle-lib"
     androidTestAnnotationProcessor "com.fourlastor:pickle-processor"
-    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

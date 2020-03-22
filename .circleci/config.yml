@@ -57,8 +57,7 @@ jobs:
     steps:
       - restore_workspace
       - gradle_cache
-      - run: cd sample
-      - run: ./gradlew assembleAndroidTest
+      - run: cd sample && ./gradlew assembleAndroidTest
   test:
     executor: java-8
     steps:

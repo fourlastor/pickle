@@ -1,11 +1,16 @@
 # Change Log
 
-## [Unreleased](https://github.com/fourlastor/pickle/tree/HEAD)
+## [v2.1.0](https://github.com/fourlastor/pickle/tree/v2.1.0) (2020-03-22)
 
-[Full Changelog](https://github.com/fourlastor/pickle/compare/v2.0.0...HEAD)
+[Full Changelog](https://github.com/fourlastor/pickle/compare/v2.0.0...v2.1.0)
 
 **Merged pull requests:**
 
+- Bump to 2.1.0 [\#70](https://github.com/fourlastor/pickle/pull/70) ([fourlastor](https://github.com/fourlastor))
+- Fix samples [\#69](https://github.com/fourlastor/pickle/pull/69) ([tasomaniac](https://github.com/tasomaniac))
+- Upgrade cucumber to latest 4.x version [\#66](https://github.com/fourlastor/pickle/pull/66) ([tasomaniac](https://github.com/tasomaniac))
+- Upgrade cucumber [\#64](https://github.com/fourlastor/pickle/pull/64) ([tasomaniac](https://github.com/tasomaniac))
+- Clean up dependencies and update minor versions [\#63](https://github.com/fourlastor/pickle/pull/63) ([tasomaniac](https://github.com/tasomaniac))
 - Bump to v2.0.0 [\#62](https://github.com/fourlastor/pickle/pull/62) ([fourlastor](https://github.com/fourlastor))
 
 ## [v2.0.0](https://github.com/fourlastor/pickle/tree/v2.0.0) (2020-03-20)

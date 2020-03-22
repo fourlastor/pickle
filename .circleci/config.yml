@@ -53,7 +53,10 @@ jobs:
             - plugin/build
             - processor/build
   assemble_samples:
-    executor: java-8
+    docker:
+        - image: circleci/android:api-28
+    environment:
+      JVM_OPTS: -Xmx3200m
     steps:
       - restore_workspace
       - gradle_cache

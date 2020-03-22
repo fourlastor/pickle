@@ -2,12 +2,16 @@ package com.fourlastor.pickle
 
 import java.io.PrintWriter
 import java.io.StringWriter
-import javax.annotation.processing.*
+import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.Messager
+import javax.annotation.processing.RoundEnvironment
+import javax.annotation.processing.SupportedAnnotationTypes
+import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 
-@SupportedAnnotationTypes("cucumber.api.java.*", "com.fourlastor.pickle.Pickle")
+@SupportedAnnotationTypes("io.cucumber.java.*", "cucumber.api.java.*", "com.fourlastor.pickle.Pickle")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 class PickleProcessor : AbstractProcessor() {
 

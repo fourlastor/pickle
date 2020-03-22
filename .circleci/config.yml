@@ -52,6 +52,13 @@ jobs:
             - lib/build
             - plugin/build
             - processor/build
+  assemble_samples:
+    executor: java-8
+    steps:
+      - restore_workspace
+      - gradle_cache
+      - run: cd sample
+      - run: ./gradlew assembleAndroidTest
   test:
     executor: java-8
     steps:
@@ -71,6 +78,9 @@ workflows:
     jobs:
       - checkout
       - build:
+          requires:
+            - checkout
+      - assemble_samples:
           requires:
             - checkout
       - test:

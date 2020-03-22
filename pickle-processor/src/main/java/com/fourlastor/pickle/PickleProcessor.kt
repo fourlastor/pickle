@@ -11,7 +11,7 @@ import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 
-@SupportedAnnotationTypes("io.cucumber.java.*", "com.fourlastor.pickle.Pickle")
+@SupportedAnnotationTypes("io.cucumber.java.*", "cucumber.api.java.*", "com.fourlastor.pickle.Pickle")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 class PickleProcessor : AbstractProcessor() {
 

@@ -1,18 +1,20 @@
 package com.fourlastor.pickle
 
-import cucumber.api.java.After
-import cucumber.api.java.Before
+import io.cucumber.java.After
+import io.cucumber.java.Before
 import javax.annotation.processing.RoundEnvironment
-import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 
+@Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
 class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
     fun createBeforeHooks(): List<TestMethodStatement> =
-            generateStatementsFor(Before::class.java, roundEnv)
+            generateStatementsFor(Before::class.java, roundEnv) +
+                    generateStatementsFor(DeprecatedBefore::class.java, roundEnv)
 
     fun createAfterHooks(): List<TestMethodStatement> =
-            generateStatementsFor(After::class.java, roundEnv)
+            generateStatementsFor(After::class.java, roundEnv) +
+                    generateStatementsFor(DeprecatedAfter::class.java, roundEnv)
 
     private fun generateStatementsFor(
             annotationType: Class<out Annotation>,
@@ -31,13 +33,9 @@ class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
     private fun ExecutableElement.annotationOrder(annotationType: Class<out Annotation>) =
             when (val annotation = getAnnotation(annotationType)) {
                 is Before -> annotation.order
+                is DeprecatedBefore -> annotation.order
                 is After -> annotation.order
+                is DeprecatedAfter -> annotation.order
                 else -> throw PickleException("Unexpected Cucumber annotation used: $annotationType")
             }
-}
-
-private fun <T : Annotation> RoundEnvironment.getMethodsAnnotatedWith(clazz: Class<T>): List<ExecutableElement> {
-    return getElementsAnnotatedWith(clazz)
-            .filter { it.kind == ElementKind.METHOD }
-            .map { it as ExecutableElement }
 }

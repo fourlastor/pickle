@@ -1,12 +1,12 @@
 package com.fourlastor.pickle
 
-import cucumber.api.java.en.And
-import cucumber.api.java.en.Given
-import cucumber.api.java.en.Then
-import cucumber.api.java.en.When
 import gherkin.ast.Step
+import io.cucumber.java.en.And
+import io.cucumber.java.en.But
+import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
 import javax.annotation.processing.RoundEnvironment
-import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 
@@ -50,24 +50,39 @@ class StatementConverter(roundEnv: RoundEnvironment) {
     }
 }
 
+@Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
 private fun RoundEnvironment.getStepDefinitions(): List<StepDefinition> {
-    val givens = getElementsAnnotatedWith(Given::class.java)
-            .filter { it.kind == ElementKind.METHOD }
-            .map { StepDefinition(it as ExecutableElement, Regex(it.getAnnotation(Given::class.java).value)) }
+    return ArrayList<StepDefinition>().apply {
+        this += getMethodsAnnotatedWith(Given::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(Given::class.java).value)) }
 
-    val thens = getElementsAnnotatedWith(Then::class.java)
-            .filter { it.kind == ElementKind.METHOD }
-            .map { StepDefinition(it as ExecutableElement, Regex(it.getAnnotation(Then::class.java).value)) }
+        this += getMethodsAnnotatedWith(DeprecatedGiven::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedGiven::class.java).value)) }
 
-    val whens = getElementsAnnotatedWith(When::class.java)
-            .filter { it.kind == ElementKind.METHOD }
-            .map { StepDefinition(it as ExecutableElement, Regex(it.getAnnotation(When::class.java).value)) }
+        this += getMethodsAnnotatedWith(Then::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(Then::class.java).value)) }
 
-    val ands = getElementsAnnotatedWith(And::class.java)
-            .filter { it.kind == ElementKind.METHOD }
-            .map { StepDefinition(it as ExecutableElement, Regex(it.getAnnotation(And::class.java).value)) }
+        this += getMethodsAnnotatedWith(DeprecatedThen::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedThen::class.java).value)) }
 
-    return givens + thens + whens + ands
+        this += getMethodsAnnotatedWith(When::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(When::class.java).value)) }
+
+        this += getMethodsAnnotatedWith(DeprecatedWhen::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedWhen::class.java).value)) }
+
+        this += getMethodsAnnotatedWith(And::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(And::class.java).value)) }
+
+        this += getMethodsAnnotatedWith(DeprecatedAnd::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedAnd::class.java).value)) }
+
+        this += getMethodsAnnotatedWith(But::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(But::class.java).value)) }
+
+        this += getMethodsAnnotatedWith(DeprecatedBut::class.java)
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedBut::class.java).value)) }
+    }
 }
 
 private data class StepDefinition(val element: ExecutableElement, val regex: Regex)

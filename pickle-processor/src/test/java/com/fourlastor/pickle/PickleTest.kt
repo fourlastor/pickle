@@ -173,6 +173,23 @@ class PickleTest {
         assertThat(compilation).hadErrorContaining("> Step implementation: steps.OtherStepsWithWrongArguments.aStepFromAnotherDefinitionFile(java.lang.String)")
     }
 
+    @Test
+    fun deprecatedAnnotationsSuppoorted() {
+        val packageName = "targetDeprecated"
+
+        val compilation = whenCompilingWith(
+                featuresDir,
+                packageName,
+                strict,
+                "steps/DeprecatedSteps.java"
+        )
+
+        assertThat(compilation).successfullyGeneratedTestClasses(
+                "$packageName/AFeatureWithoutBackgroundTest.java",
+                "$packageName/AFeatureWithBackgroundTest.java"
+        )
+    }
+
     private fun featuresDir(dirName: String) = Resources.getResource(dirName).path
 
     private fun whenCompilingWith(

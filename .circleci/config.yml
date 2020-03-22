@@ -52,6 +52,15 @@ jobs:
             - lib/build
             - plugin/build
             - processor/build
+  assemble_samples:
+    docker:
+        - image: circleci/android:api-28
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - restore_workspace
+      - gradle_cache
+      - run: cd sample && ./gradlew assembleAndroidTest
   test:
     executor: java-8
     steps:
@@ -71,6 +80,9 @@ workflows:
     jobs:
       - checkout
       - build:
+          requires:
+            - checkout
+      - assemble_samples:
           requires:
             - checkout
       - test:

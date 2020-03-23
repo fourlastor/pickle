@@ -70,6 +70,12 @@ jobs:
       - gradle_cache
       - run: ./gradlew test
       - run: ./gradlew bintrayUpload -PbintrayUser=user -PbintrayKey=key -PdryRun=true
+  static_analysis:
+    executor: java-8
+    steps:
+      - restore_workspace
+      - gradle_cache
+      - run: ./gradlew detekt
   deploy_bintray:
     executor: java-8
     steps:
@@ -88,6 +94,9 @@ workflows:
           requires:
             - checkout
       - test:
+          requires:
+            - build
+      - static_analysis:
           requires:
             - build
   build-deploy:

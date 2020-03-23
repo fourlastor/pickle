@@ -92,7 +92,7 @@ workflows:
             - checkout
       - assemble_samples:
           requires:
-            - checkout
+            - build
       - test:
           requires:
             - build

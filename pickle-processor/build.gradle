@@ -22,7 +22,6 @@ detekt {
     config = rootProject.files('config/detekt/detekt.yml')
 }
 
-
 dependencies {
     implementation "io.cucumber:cucumber-java:$cucumber_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

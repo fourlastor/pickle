@@ -1,5 +1,4 @@
 plugins {
-    id 'java-gradle-plugin'
     id("io.gitlab.arturbosch.detekt").version("$detekt_version")
 }
 

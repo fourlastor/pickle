@@ -5,6 +5,11 @@ executors:
       - image: circleci/openjdk:8-jdk
     environment:
       JVM_OPTS: -Xmx3200m
+  android:
+    docker:
+      - image: circleci/android:api-28
+    environment:
+      JVM_OPTS: -Xmx3200m
 commands:
   restore_workspace:
     steps:
@@ -53,10 +58,7 @@ jobs:
             - plugin/build
             - processor/build
   assemble_samples:
-    docker:
-        - image: circleci/android:api-28
-    environment:
-      JVM_OPTS: -Xmx3200m
+    executor: android
     steps:
       - restore_workspace
       - gradle_cache

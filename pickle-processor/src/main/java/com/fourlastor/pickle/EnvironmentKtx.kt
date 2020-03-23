@@ -6,6 +6,6 @@ import javax.lang.model.element.ExecutableElement
 
 internal fun <T : Annotation> RoundEnvironment.getMethodsAnnotatedWith(clazz: Class<T>): List<ExecutableElement> {
     return getElementsAnnotatedWith(clazz)
-            .filter { it.kind == ElementKind.METHOD }
-            .map { it as ExecutableElement }
+        .filter { it.kind == ElementKind.METHOD }
+        .map { it as ExecutableElement }
 }

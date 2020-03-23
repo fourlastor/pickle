@@ -3,8 +3,8 @@ package com.fourlastor.pickle
 import cucumber.runtime.model.CucumberFeature
 
 class ClassConverter(
-        private val methodsConverter: MethodsConverter,
-        private val hooksCreator: HooksCreator
+    private val methodsConverter: MethodsConverter,
+    private val hooksCreator: HooksCreator
 ) {
 
     fun convert(feature: CucumberFeature): TestClass {
@@ -13,15 +13,15 @@ class ClassConverter(
         val hooks = hooksCreator.create()
 
         val fields = methods.filterIsInstance(ImplementedTestMethod::class.java).flatMap { it.statements }
-                .plus(hooks.flatMap { it.statements })
-                .map { it.field }
-                .toSet()
+            .plus(hooks.flatMap { it.statements })
+            .map { it.field }
+            .toSet()
 
         return TestClass(
-                "${gherkinFeature.name.toCamelCase()}Test",
-                hooks,
-                methods,
-                fields
+            "${gherkinFeature.name.toCamelCase()}Test",
+            hooks,
+            methods,
+            fields
         )
     }
 }

@@ -24,20 +24,20 @@ class ClassGenerator {
         }
 
         testClass.hookMethods
-                .filter { it.statements.isNotEmpty() }
-                .forEach { hook ->
-                    method(hook.name) {
-                        addModifiers(Modifier.PUBLIC)
-                        addException(Throwable::class.java)
-                        addAnnotation(hook.annotation)
+            .filter { it.statements.isNotEmpty() }
+            .forEach { hook ->
+                method(hook.name) {
+                    addModifiers(Modifier.PUBLIC)
+                    addException(Throwable::class.java)
+                    addAnnotation(hook.annotation)
 
-                        code {
-                            hook.statements.forEach {
-                                addStatement(it.statementFormat, *it.args.toTypedArray())
-                            }
+                    code {
+                        hook.statements.forEach {
+                            addStatement(it.statementFormat, *it.args.toTypedArray())
                         }
                     }
                 }
+            }
 
         testClass.methods.forEach { method ->
             method(method.name) {
@@ -59,28 +59,28 @@ class ClassGenerator {
         }
 
         testClass.fields.map { it.toFieldSpec() }
-                .forEach { addField(it) }
+            .forEach { addField(it) }
     }
 
     private fun TestClass.isAllTestsIgnored() = methods.all { it is IgnoredTestMethod }
 
     private fun ignore(scenarioName: String) = AnnotationSpec.builder(Ignore)
-            .addMember("value", "\$S", "Missing steps for scenario \"$scenarioName\"")
-            .build()
+        .addMember("value", "\$S", "Missing steps for scenario \"$scenarioName\"")
+        .build()
 
     private fun TypeSpec.Builder.runWithJUnit4() = addAnnotation(
-            AnnotationSpec.builder(RunWith)
-                    .addMember("value", "\$T.class", AndroidJUnit4)
-                    .build()
+        AnnotationSpec.builder(RunWith)
+            .addMember("value", "\$T.class", AndroidJUnit4)
+            .build()
     )
 
     private fun TestField.toFieldSpec(): FieldSpec {
         val stepsClass = ClassName.get(type)
 
         return FieldSpec.builder(stepsClass, name)
-                .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-                .initializer("new \$T()", stepsClass)
-                .build()
+            .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+            .initializer("new \$T()", stepsClass)
+            .build()
     }
 }
 

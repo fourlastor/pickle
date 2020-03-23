@@ -9,16 +9,16 @@ import javax.lang.model.element.TypeElement
 @Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
 class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
     fun createBeforeHooks(): List<TestMethodStatement> =
-            generateStatementsFor(Before::class.java, roundEnv) +
-                    generateStatementsFor(DeprecatedBefore::class.java, roundEnv)
+        generateStatementsFor(Before::class.java, roundEnv) +
+                generateStatementsFor(DeprecatedBefore::class.java, roundEnv)
 
     fun createAfterHooks(): List<TestMethodStatement> =
-            generateStatementsFor(After::class.java, roundEnv) +
-                    generateStatementsFor(DeprecatedAfter::class.java, roundEnv)
+        generateStatementsFor(After::class.java, roundEnv) +
+                generateStatementsFor(DeprecatedAfter::class.java, roundEnv)
 
     private fun generateStatementsFor(
-            annotationType: Class<out Annotation>,
-            roundEnv: RoundEnvironment
+        annotationType: Class<out Annotation>,
+        roundEnv: RoundEnvironment
     ): List<TestMethodStatement> {
         val methods = roundEnv.getMethodsAnnotatedWith(annotationType)
 
@@ -31,11 +31,11 @@ class StatementHooksCreator(private val roundEnv: RoundEnvironment) {
     }
 
     private fun ExecutableElement.annotationOrder(annotationType: Class<out Annotation>) =
-            when (val annotation = getAnnotation(annotationType)) {
-                is Before -> annotation.order
-                is DeprecatedBefore -> annotation.order
-                is After -> annotation.order
-                is DeprecatedAfter -> annotation.order
-                else -> throw PickleException("Unexpected Cucumber annotation used: $annotationType")
-            }
+        when (val annotation = getAnnotation(annotationType)) {
+            is Before -> annotation.order
+            is DeprecatedBefore -> annotation.order
+            is After -> annotation.order
+            is DeprecatedAfter -> annotation.order
+            else -> throw PickleException("Unexpected Cucumber annotation used: $annotationType")
+        }
 }

@@ -12,5 +12,4 @@ internal class FileResource(private val file: File) : Resource {
 
     @Throws(IOException::class)
     override fun getInputStream(): InputStream = FileInputStream(file)
-
 }

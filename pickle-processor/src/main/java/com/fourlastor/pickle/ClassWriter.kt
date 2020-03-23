@@ -5,16 +5,16 @@ import com.squareup.javapoet.TypeSpec
 import javax.annotation.processing.ProcessingEnvironment
 
 class ClassWriter(
-        private val processingEnv: ProcessingEnvironment,
-        private val packageName: String
+    private val processingEnv: ProcessingEnvironment,
+    private val packageName: String
 ) {
     fun write(typeSpec: TypeSpec) {
         val sourceFile = processingEnv.filer.createSourceFile("$packageName.${typeSpec.name}")
 
         sourceFile.openWriter().use {
             JavaFile.builder(packageName, typeSpec)
-                    .build()
-                    .writeTo(it)
+                .build()
+                .writeTo(it)
         }
     }
 }

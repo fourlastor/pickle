@@ -20,6 +20,7 @@ class PickleProcessor : AbstractProcessor() {
             return false
         }
 
+        @Suppress("TooGenericExceptionCaught") // we want to catch them and fail the processor execution
         try {
             options(roundEnv).run {
                 val parser = FeatureParser()
@@ -29,10 +30,10 @@ class PickleProcessor : AbstractProcessor() {
                 val writer = ClassWriter(processingEnv, packageName)
 
                 parser.parse(featuresDirPath)
-                        .map { classConverter.convert(it) }
-                        .filter { it.methods.isNotEmpty() }
-                        .map { generator.generate(it) }
-                        .forEach { writer.write(it) }
+                    .map { classConverter.convert(it) }
+                    .filter { it.methods.isNotEmpty() }
+                    .map { generator.generate(it) }
+                    .forEach { writer.write(it) }
             }
         } catch (exception: PickleException) {
             processingEnv.messager.error("Pickle Error:\n${exception.message}\n")
@@ -50,12 +51,12 @@ class PickleProcessor : AbstractProcessor() {
 
     private fun Options.createClassConverter(roundEnv: RoundEnvironment, messager: Messager): ClassConverter {
         return ClassConverter(
-                MethodsConverter(
-                        MethodConverter(StatementConverter(roundEnv)),
-                        strictMode,
-                        messager
-                ),
-                HooksCreator(StatementHooksCreator(roundEnv))
+            MethodsConverter(
+                MethodConverter(StatementConverter(roundEnv)),
+                strictMode,
+                messager
+            ),
+            HooksCreator(StatementHooksCreator(roundEnv))
         )
     }
 

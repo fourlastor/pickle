@@ -63,11 +63,14 @@ class PickleTest {
         )
 
         assertThat(compilation).failed()
-        assertThat(compilation).hadErrorContaining("Multiple step implementations matched.")
-        assertThat(compilation).hadErrorContaining("> Step definition: \"A step with 1 as parameter\"")
-        assertThat(compilation).hadErrorContaining("> Step implementation with regexes:")
-        assertThat(compilation).hadErrorContaining("^A step with (\\w+) as parameter$")
-        assertThat(compilation).hadErrorContaining("^A step with (\\w?) as parameter$")
+        assertThat(compilation).hadErrorContaining("""
+Pickle Error:
+  Multiple step implementations matched.
+  > Step definition: "A step with 1 as parameter"
+  > Step implementation with regexes:
+  ^A step with (\w+) as parameter$
+  ^A step with (\w?) as parameter$
+        """.trimIndent())
     }
 
     @Test
@@ -82,8 +85,10 @@ class PickleTest {
         )
 
         assertThat(compilation).succeeded()
-        assertThat(compilation).hadWarningContaining("Missing step definition for \"A step from another definition file\"")
-        assertThat(compilation).hadWarningContaining("\"Scenario: Scenario with one step and background\" will be skipped.")
+        assertThat(compilation).hadWarningContaining("""
+Missing step definition for "A step from another definition file"
+  "Scenario: Scenario with one step and background" will be skipped.
+        """.trimIndent())
         assertThat(compilation).successfullyGeneratedTestClasses(
             "$packageName/AFeatureWithoutBackgroundTest.java"
         )
@@ -153,9 +158,12 @@ class PickleTest {
         )
 
         assertThat(compilation).failed()
-        assertThat(compilation).hadErrorContaining("Scenarios need to have unique names.")
-        assertThat(compilation).hadErrorContaining("Duplicate scenarios:")
-        assertThat(compilation).hadErrorContaining("> Duplicate scenario")
+        assertThat(compilation).hadErrorContaining("""
+Pickle Error:
+  Scenarios need to have unique names.
+  Duplicate scenarios:
+  > Duplicate scenario
+        """.trimIndent())
     }
 
     @Test
@@ -168,9 +176,12 @@ class PickleTest {
         )
 
         assertThat(compilation).failed()
-        assertThat(compilation).hadErrorContaining("Step definition argument mismatch.")
-        assertThat(compilation).hadErrorContaining("> Step definition: \"A step from another definition file\"")
-        assertThat(compilation).hadErrorContaining("> Step implementation: steps.OtherStepsWithWrongArguments.aStepFromAnotherDefinitionFile(java.lang.String)")
+        assertThat(compilation).hadErrorContaining("""
+Pickle Error:
+  Step definition argument mismatch.
+  > Step definition: "A step from another definition file"
+  > Step implementation: steps.OtherStepsWithWrongArguments.aStepFromAnotherDefinitionFile(java.lang.String)
+        """.trimIndent())
     }
 
     @Test

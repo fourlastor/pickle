@@ -1,3 +1,7 @@
+plugins {
+    id("io.gitlab.arturbosch.detekt").version("$detekt_version")
+}
+
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply from: "$rootDir/dependencies.gradle"
@@ -10,6 +14,11 @@ publish {
     publishVersion = "$pickle_version"
     desc = 'Cucumber implementation via code generation (library)'
     website = 'https://github.com/fourlastor/pickle'
+}
+
+detekt {
+    toolVersion = "$detekt_version"
+    config = rootProject.files('config/detekt/detekt.yml')
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_7

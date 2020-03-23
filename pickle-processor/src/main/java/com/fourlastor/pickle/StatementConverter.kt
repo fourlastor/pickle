@@ -32,7 +32,11 @@ class StatementConverter(roundEnv: RoundEnvironment) {
         return TestField(type)
     }
 
-    private fun createStatement(stepDefinition: StepDefinition, step: Step, stepsField: TestField): TestMethodStatement {
+    private fun createStatement(
+        stepDefinition: StepDefinition,
+        step: Step,
+        stepsField: TestField
+    ): TestMethodStatement {
         val matches = stepDefinition.regex.matchEntire(step.text) ?: throw MissingStepDefinitionException(step.text)
 
         val parameterValues = matches.groupValues.drop(1).toTypedArray()
@@ -40,12 +44,13 @@ class StatementConverter(roundEnv: RoundEnvironment) {
         if (parameterTypes.size != parameterValues.size) {
             throw StepDefinitionArgumentsMismatchException(step.text, stepDefinition.element)
         }
-        val parameterStringFormat = parameterTypes.joinToString(", ") { if (it.toString() == String::class.java.name) "\$S" else "\$L" }
+        val parameterStringFormat =
+            parameterTypes.joinToString(", ") { if (it.toString() == String::class.java.name) "\$S" else "\$L" }
         return testMethodStatement(
-                testField = stepsField,
-                statementFormat = "\$N.\$N($parameterStringFormat)",
-                methodName = stepDefinition.element.simpleName,
-                args = *parameterValues
+            testField = stepsField,
+            statementFormat = "\$N.\$N($parameterStringFormat)",
+            methodName = stepDefinition.element.simpleName,
+            args = *parameterValues
         )
     }
 }
@@ -53,38 +58,42 @@ class StatementConverter(roundEnv: RoundEnvironment) {
 @Suppress("TYPEALIAS_EXPANSION_DEPRECATION")
 private fun RoundEnvironment.getStepDefinitions(): List<StepDefinition> {
     return getMethodsAnnotatedWith(Given::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(Given::class.java).value)) } +
+        .map { StepDefinition(it, Regex(it.getAnnotation(Given::class.java).value)) } +
             getMethodsAnnotatedWith(DeprecatedGiven::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedGiven::class.java).value)) } +
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedGiven::class.java).value)) } +
             getMethodsAnnotatedWith(Then::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(Then::class.java).value)) } +
+                .map { StepDefinition(it, Regex(it.getAnnotation(Then::class.java).value)) } +
             getMethodsAnnotatedWith(DeprecatedThen::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedThen::class.java).value)) } +
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedThen::class.java).value)) } +
             getMethodsAnnotatedWith(When::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(When::class.java).value)) } +
+                .map { StepDefinition(it, Regex(it.getAnnotation(When::class.java).value)) } +
             getMethodsAnnotatedWith(DeprecatedWhen::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedWhen::class.java).value)) } +
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedWhen::class.java).value)) } +
             getMethodsAnnotatedWith(And::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(And::class.java).value)) } +
+                .map { StepDefinition(it, Regex(it.getAnnotation(And::class.java).value)) } +
             getMethodsAnnotatedWith(DeprecatedAnd::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedAnd::class.java).value)) } +
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedAnd::class.java).value)) } +
             getMethodsAnnotatedWith(But::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(But::class.java).value)) } +
+                .map { StepDefinition(it, Regex(it.getAnnotation(But::class.java).value)) } +
             getMethodsAnnotatedWith(DeprecatedBut::class.java)
-                    .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedBut::class.java).value)) }
+                .map { StepDefinition(it, Regex(it.getAnnotation(DeprecatedBut::class.java).value)) }
 }
 
 private data class StepDefinition(val element: ExecutableElement, val regex: Regex)
 
-class StepDefinitionArgumentsMismatchException(stepName: String, element: ExecutableElement) : PickleException("""
+class StepDefinitionArgumentsMismatchException(stepName: String, element: ExecutableElement) : PickleException(
+    """
     Step definition argument mismatch.
     > Step definition: "$stepName"
     > Step implementation: ${element.enclosingElement}.$element
-""".trimIndent())
+""".trimIndent()
+)
 
-class AmbiguousStepDefinitionException(stepName: String, matching: List<Regex>) : PickleException("""
+class AmbiguousStepDefinitionException(stepName: String, matching: List<Regex>) : PickleException(
+    """
     Multiple step implementations matched.
     > Step definition: "$stepName"
     > Step implementation with regexes:
     ${matching.joinToString(separator = "\n    ")}
-""".trimIndent())
+""".trimIndent()
+)

@@ -15,17 +15,17 @@ internal fun Examples.toScenarios(outline: ScenarioOutline): List<Scenario> {
 
 private fun ScenarioOutline.createExampleScenario(header: TableRow, example: TableRow): Scenario {
     return Scenario(
-            tags,
-            example.location,
-            keyword,
-            name.replaceTokens(header.cells, example.cells),
-            "",
-            steps.map { it.createExampleStep(header, example) }
+        tags,
+        example.location,
+        keyword,
+        name.replaceTokens(header.cells, example.cells),
+        "",
+        steps.map { it.createExampleStep(header, example) }
     )
 }
 
 private fun Step.createExampleStep(header: TableRow, example: TableRow): Step =
-        Step(location, keyword, this.text.replaceTokens(header.cells, example.cells), null)
+    Step(location, keyword, this.text.replaceTokens(header.cells, example.cells), null)
 
 private fun String.replaceTokens(headerCells: List<TableCell>, exampleCells: List<TableCell>): String {
     var text = this

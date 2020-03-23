@@ -12,9 +12,8 @@ class HooksCreator(private val statementHooksCreator: StatementHooksCreator) {
     }
 
     private fun beforeHookMethod(statements: List<TestMethodStatement>) =
-            HookMethod(ClassName.bestGuess("org.junit.Before")!!, "setUp", statements)
+        HookMethod(ClassName.bestGuess("org.junit.Before")!!, "setUp", statements)
 
     private fun afterHookMethod(statements: List<TestMethodStatement>) =
-            HookMethod(ClassName.bestGuess("org.junit.After")!!, "tearDown", statements)
-
+        HookMethod(ClassName.bestGuess("org.junit.After")!!, "tearDown", statements)
 }

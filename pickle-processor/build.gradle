@@ -1,5 +1,9 @@
 import org.gradle.internal.jvm.Jvm
 
+plugins {
+    id("io.gitlab.arturbosch.detekt").version("$detekt_version")
+}
+
 apply plugin: 'kotlin'
 apply from: rootProject.file('dependencies.gradle')
 apply plugin: 'com.novoda.bintray-release'
@@ -13,6 +17,11 @@ publish {
     website = 'https://github.com/fourlastor/pickle'
 }
 
+detekt {
+    toolVersion = "$detekt_version"
+    config = rootProject.files('config/detekt/detekt.yml')
+}
+
 dependencies {
     implementation "io.cucumber:cucumber-java:$cucumber_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -23,6 +32,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testImplementation 'org.mockito:mockito-core:3.1.0'
     testImplementation files(Jvm.current().getToolsJar())
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_7

@@ -5,6 +5,11 @@ executors:
       - image: circleci/openjdk:8-jdk
     environment:
       JVM_OPTS: -Xmx3200m
+  android:
+    docker:
+      - image: circleci/android:api-28
+    environment:
+      JVM_OPTS: -Xmx3200m
 commands:
   restore_workspace:
     steps:
@@ -53,10 +58,7 @@ jobs:
             - plugin/build
             - processor/build
   assemble_samples:
-    docker:
-        - image: circleci/android:api-28
-    environment:
-      JVM_OPTS: -Xmx3200m
+    executor: android
     steps:
       - restore_workspace
       - gradle_cache
@@ -68,6 +70,12 @@ jobs:
       - gradle_cache
       - run: ./gradlew test
       - run: ./gradlew bintrayUpload -PbintrayUser=user -PbintrayKey=key -PdryRun=true
+  static_analysis:
+    executor: java-8
+    steps:
+      - restore_workspace
+      - gradle_cache
+      - run: ./gradlew detekt
   deploy_bintray:
     executor: java-8
     steps:
@@ -84,8 +92,11 @@ workflows:
             - checkout
       - assemble_samples:
           requires:
-            - checkout
+            - build
       - test:
+          requires:
+            - build
+      - static_analysis:
           requires:
             - build
   build-deploy:

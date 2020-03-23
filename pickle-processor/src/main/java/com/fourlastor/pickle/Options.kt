@@ -8,9 +8,9 @@ fun options(roundEnvironment: RoundEnvironment): Options {
     val options = roundEnvironment.getElementsAnnotatedWith(Pickle::class.java)
     return options.first().getAnnotation(Pickle::class.java).run {
         Options(
-                featuresDir,
-                packageName,
-                strictMode
+            featuresDir,
+            packageName,
+            strictMode
         )
     }
 }

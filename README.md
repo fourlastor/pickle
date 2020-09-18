@@ -14,8 +14,8 @@ Add this to your app `build.gradle` dependencies.
 
 ```gradle
 
-ext.pickleVersion = '1.3.2'
-ext.cucumberVersion = '4.4.0' // Last supported version. Do not use never versions since annotation packages were moved.
+ext.pickleVersion = '2.1.0'
+ext.cucumberVersion = '4.8.1' // Last supported version.
 
 buildscript {
   repositories {
@@ -94,5 +94,4 @@ It uses [composite builds](https://docs.gradle.org/current/userguide/composite_b
 
 - Cucumber Expressions are not supported yet. [Issue #52](https://github.com/fourlastor/pickle/issues/52).
     - IntelliJ IDEA Plugin recently started to use Cucumber Expressions by default for parameters. Convert them to Regex for Pickle to understand.
-- The package of `Given/When/Then` annotations were moved with recent Cucumber versions. New locations are not supported yet. [Issue #48](https://github.com/fourlastor/pickle/issues/48).
 

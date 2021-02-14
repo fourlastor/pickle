@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel>
-      <module name="pickle.pickle-lib" target="1.7" />
+    <bytecodeTargetLevel target="1.7">
       <module name="pickle.pickle-lib.main" target="1.7" />
       <module name="pickle.pickle-lib.test" target="1.7" />
+      <module name="pickle.pickle-plugin" target="1.8" />
       <module name="pickle.pickle-plugin.main" target="1.8" />
       <module name="pickle.pickle-plugin.test" target="1.8" />
-      <module name="pickle.pickle-processor" target="1.7" />
       <module name="pickle.pickle-processor.main" target="1.7" />
       <module name="pickle.pickle-processor.test" target="1.7" />
       <module name="processor" target="1.7" />

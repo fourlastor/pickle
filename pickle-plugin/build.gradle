@@ -5,16 +5,15 @@ plugins {
 
 apply plugin: 'kotlin'
 apply from: "$rootDir/dependencies.gradle"
-apply plugin: 'com.novoda.bintray-release'
 
-publish {
-    userOrg = 'fourlastor'
-    groupId = 'com.fourlastor'
-    artifactId = 'pickle-plugin'
-    publishVersion = "$pickle_version"
-    desc = 'Cucumber implementation via code generation (plugin)'
-    website = 'https://github.com/fourlastor/pickle'
-}
+//publish {
+//    userOrg = 'fourlastor'
+//    groupId = 'com.fourlastor'
+//    artifactId = 'pickle-plugin'
+//    publishVersion = "$pickle_version"
+//    desc = 'Cucumber implementation via code generation (plugin)'
+//    website = 'https://github.com/fourlastor/pickle'
+//}
 
 detekt {
     toolVersion = "$detekt_version"

@@ -1,19 +1,25 @@
 buildscript {
     apply from: rootProject.file('dependencies.gradle')
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.novoda:bintray-release:0.9'
     }
 }
 
 subprojects {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     group 'com.fourlastor'
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.jetbrains.trove4j" && requested.name == "trove4j" && requested.version == "20160824") {
+                useTarget("org.jetbrains.intellij.deps:trove4j:1.0.20181211")
+            }
+        }
+    }
 }
 
 task clean(type: Delete) {

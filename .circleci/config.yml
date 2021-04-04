@@ -69,19 +69,34 @@ jobs:
       - restore_workspace
       - gradle_cache
       - run: ./gradlew test
-      - run: ./gradlew bintrayUpload -PbintrayUser=user -PbintrayKey=key -PdryRun=true
   static_analysis:
     executor: java-8
     steps:
       - restore_workspace
       - gradle_cache
       - run: ./gradlew detekt
-  deploy_bintray:
+  unwrap_gpg_key:
+    executor: java-8
+    steps:
+      - restore_workspace
+      - run: echo '$GPG_KEY_CONTENTS' | base64 -d > '$SIGNING_SECRET_KEY_RING_FILE'
+      - persist_to_workspace:
+          root: .
+          paths:
+            - $SIGNING_SECRET_KEY_RING_FILE
+  deploy_maven:
     executor: java-8
     steps:
       - restore_workspace
       - gradle_cache
-      - run: ./gradlew bintrayUpload -PbintrayUser=$BINTRAY_USER -PbintrayKey=$BINTRAY_KEY -PdryRun=false
+      - run: ./gradlew pickle-processor:publish
+      - run: ./gradlew pickle-lib:publish
+  deply_gradle_plugin:
+    executor: java-8
+    steps:
+      - restore_workspace
+      - gradle_cache
+      - run: ./gradlew pickle-plugin:publishPlugins -Pgradle.publish.key=$GRADLE_PUBLISH_KEY -Pgradle.publish.secret=$GRADLE_PUBLISH_SECRET
 workflows:
   version: 2
   build-test:
@@ -123,7 +138,7 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
-      - deploy_bintray:
+      - deply_gradle_plugin:
           requires:
             - test
           filters:

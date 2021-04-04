@@ -1,15 +1,13 @@
 plugins {
     id 'java-gradle-plugin'
     id("io.gitlab.arturbosch.detekt").version("$detekt_version")
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '0.12.0'
 }
 
 apply plugin: 'kotlin'
 apply from: "$rootDir/dependencies.gradle"
-
-ext {
-    PUBLISH_ARTIFACT_ID = 'pickle-plugin'
-}
-apply from: "${rootProject.projectDir}/scripts/publish-mavencentral.gradle"
+apply from: rootProject.file('scripts/publish-info.gradle')
 
 detekt {
     toolVersion = "$detekt_version"
@@ -25,10 +23,22 @@ configurations {
     includeInJar
 }
 
+
+pluginBundle {
+    website = 'https://github.com/fourlastor/pickle/'
+    vcsUrl = 'https://github.com/fourlastor/pickle/'
+    tags = ['testing', 'cucumber', 'pickle']
+}
+
+group = ext['PUBLISH_GROUP_ID']
+version = ext['PUBLISH_VERSION']
+
 gradlePlugin {
     plugins {
         pickle {
-            id = 'io.github.fourlastor'
+            id = 'io.github.fourlastor.pickle-processor'
+            displayName = 'Pickle for Android'
+            description = 'An implementation of Cucumber for Android which generates the tests classes at compile time instead of runtime '
             implementationClass = 'com.fourlastor.pickle.PicklePlugin'
         }
     }

@@ -1,0 +1,4 @@
+ext {
+    PUBLISH_GROUP_ID = 'io.github.fourlastor'
+    PUBLISH_VERSION = "2.1.0"
+}

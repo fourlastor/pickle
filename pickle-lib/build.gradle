@@ -5,16 +5,11 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply from: "$rootDir/dependencies.gradle"
-apply plugin: 'com.novoda.bintray-release'
 
-publish {
-    userOrg = 'fourlastor'
-    groupId = 'com.fourlastor'
-    artifactId = 'pickle-lib'
-    publishVersion = "$pickle_version"
-    desc = 'Cucumber implementation via code generation (library)'
-    website = 'https://github.com/fourlastor/pickle'
+ext {
+    PUBLISH_ARTIFACT_ID = 'pickle-lib'
 }
+apply from: "${rootProject.projectDir}/scripts/publish-mavencentral.gradle"
 
 detekt {
     toolVersion = "$detekt_version"
